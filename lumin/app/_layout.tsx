@@ -4,12 +4,31 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { Image } from 'react-native';
 import 'react-native-reanimated';
-
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { LinearGradient } from 'expo-linear-gradient';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+const defaultHeaderOptions = {
+  headerShown: true,
+  headerTitle: () => (
+    <Image 
+      source={require("../assets/images/lumin-blacklogo.png")}
+      style={{width: 110, height: 55, resizeMode: "contain" }} 
+    />
+  ),
+  headerTitleAlign: 'center' as 'center',
+  headerBackground: () => (
+    <LinearGradient
+      colors={["#02EFFA", "#02DBFF", "#02F1FB"]}
+      style={{ flex: 1 }}
+    />
+  ),
+  headerTintColor: '#fff',
+};
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -30,12 +49,11 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="welcome" options={{ headerShown: false, headerTitle: "WELCOME" }} />
-        <Stack.Screen name="login" options={{ headerShown: false}} />
-        <Stack.Screen name="register" options={{ headerShown: false}} />
+        <Stack.Screen name="welcome" options={defaultHeaderOptions} />
+        <Stack.Screen name="login" options={defaultHeaderOptions} />
+        <Stack.Screen name="register" options={defaultHeaderOptions}/>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
-        <Stack.Screen name="+not-found" />
+        <Stack.Screen name="+not-found" options={defaultHeaderOptions} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

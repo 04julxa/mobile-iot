@@ -1,7 +1,8 @@
 import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons'
 import { Link, useRouter } from 'expo-router'
+
 import { LinearGradient } from 'expo-linear-gradient'
 
 const welcome = () => {
@@ -11,20 +12,19 @@ const welcome = () => {
     }
     return (
     <LinearGradient
-    colors = {['#4c669f', '#3b5998', '#192f6a']}
-    start={{ x: 0, y: 0 }}  
-    end={{ x: 1, y: 1 }}   
-    style={{ flex: 1 }}>
+    colors={["#18191A", "#222325", "#2D2E30", "#3A3B3C", "#222325"]}
+    style={styles.container}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 1, y: 1 }}>
         <View style={styles.formContainer}>
-            <AntDesign name="home" size={100} color="black" />
-            <Text style={{color: 'black', fontSize: 23, marginBottom: 20}}>Lumin</Text>
-            <Text style={{color: 'black', fontSize: 24, marginBottom: 20}}>Seja bem vindo</Text>
+            <Image source={require('../assets/images/lumin-bluelogo.png')} style={{ width: 100, height: 100, marginBottom: 20 }} />
+            <Text style={{color: '#02DBFF', fontSize: 24, marginTop: 50, marginBottom: 20, fontWeight: 'semibold'}}>Seja bem vindo!</Text>
         </View>
-        <TouchableOpacity style={styles.loginButton} onPress={() => {replacePath('/login')}}>|
-        <Text style={{color: 'black'}}>Login</Text>
+        <TouchableOpacity style={styles.loginButton} onPress={() => {replacePath('/login')}}>
+            <Text style={{color: 'black', fontWeight: 'bold'}}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.registerButton} onPress={() => {replacePath('/register')}}>|
-        <Text style={{color: 'black'}}>Registrar</Text>
+        <TouchableOpacity style={styles.registerButton} onPress={() => {replacePath('/register')}}>
+            <Text style={{color: 'black', fontWeight: 'bold'}}>Registrar</Text>
         </TouchableOpacity>
     </LinearGradient>
     
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
         width: '80%',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#3b5998',
+        backgroundColor: '#02DBFF',
         alignSelf: 'center' 
     },
     registerButton: {
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
         width: '80%',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#3b5998',
+        backgroundColor: '#02DBFF',
         alignSelf: 'center'
     }
 })
