@@ -4,28 +4,27 @@ import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { LinearGradient } from 'expo-linear-gradient'
 
-function loginPage() {
+function LoginPage() {
     const router = useRouter()
     const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-    const replacePath = (path: any) => {
-        router.replace(path)
-    }
+
     return (
         <LinearGradient
             colors={["#18191A", "#222325", "#2D2E30", "#3A3B3C", "#222325"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{ flex: 1 }}>
+
             <View style={styles.formContainer}>
 
                 <View style={styles.logoContainer}>
                     <MaterialCommunityIcons style={styles.logo} name="account-circle" size={34} color='#02DBFF'/>
-                    <Text style={styles.title}> Entre na sua conta</Text>
+                    <Text style={styles.title}>Entre na sua conta</Text>
                 </View>
 
                 <TextInput
                     style={styles.input}
-                    placeholder="User ou Email"
+                    placeholder="Usuário ou Email"
                     placeholderTextColor="#02DBFF"
                 />
                 <View style={styles.passwordInput}>
@@ -44,12 +43,17 @@ function loginPage() {
                 </View>
 
             </View>
-            <TouchableOpacity style={styles.loginButton} onPress={() => { replacePath('/home') }}>
-                <Text style={{ color: 'black' }}>Entrar</Text>
+
+            {/* Botão Entrar */}
+            <TouchableOpacity style={styles.loginButton} onPress={() => router.push('/home')}>
+                <Text style={{ color: 'black', fontWeight: 'bold' }}>Entrar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.registerButton} onPress={() => { replacePath('/welcome') }}>
-                <Text style={{ color: 'black' }}>Voltar</Text>
+
+            {/* Botão Voltar */}
+            <TouchableOpacity style={styles.registerButton} onPress={() => router.push('/welcome')}>
+                <Text style={{ color: 'black', fontWeight: 'bold' }}>Voltar</Text>
             </TouchableOpacity>
+
         </LinearGradient>
     )
 }
@@ -148,4 +152,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default loginPage
+export default LoginPage
