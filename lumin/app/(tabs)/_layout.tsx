@@ -1,45 +1,90 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
-
-import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { Image } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        tabBarStyle: {
+          backgroundColor: '#222325', 
+        },
+        tabBarActiveTintColor: '#02DBFF', 
+        tabBarInactiveTintColor: '#02DBFF', 
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
-          title: 'Home',
+          title: 'Feed',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          headerTitle: () => (
+            <Image
+              source={require('../../assets/images/lumin-blacklogo.png')}
+              style={{ width: 100, height: 40, resizeMode: 'contain' }} // Reduzi um pouco o tamanho da logo
+            />
+          ),
+          headerTitleAlign: 'center',
+          headerBackground: () => (
+            <LinearGradient
+              colors={['#02EFFA', '#02DBFF', '#02F1FB']}
+              style={{ flex: 1 }}
+            />
+          ),
+          headerStyle: {
+            height: 70, 
+          },
         }}
-      />
+      />,
       <Tabs.Screen
-        name="explore"
+        name="cart"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Cart',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          headerTitle: () => (
+            <Image
+              source={require('../../assets/images/lumin-blacklogo.png')}
+              style={{ width: 110, height: 55, resizeMode: 'contain' }}
+            />
+          ),
+          headerTitleAlign: 'center',
+          headerBackground: () => (
+            <LinearGradient
+              colors={['#02EFFA', '#02DBFF', '#02F1FB']}
+              style={{ flex: 1 }}
+              />
+          ),
+          headerStyle: {
+            height: 70, 
+          },
         }}
-      />
+      />,
+
+<Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          headerTitle: () => (
+            <Image
+              source={require('../../assets/images/lumin-blacklogo.png')}
+              style={{ width: 110, height: 55, resizeMode: 'contain' }}
+            />
+          ),
+          headerTitleAlign: 'center',
+          headerBackground: () => (
+            <LinearGradient
+              colors={['#02EFFA', '#02DBFF', '#02F1FB']}
+              style={{ flex: 1 }}
+              />
+          ),
+          headerStyle: {
+            height: 70, 
+          },
+        }}
+      />, 
     </Tabs>
   );
 }
