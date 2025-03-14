@@ -9,7 +9,6 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { LinearGradient } from 'expo-linear-gradient';
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 const defaultHeaderOptions = {
@@ -52,10 +51,14 @@ export default function RootLayout() {
         <Stack.Screen name="welcome" options={defaultHeaderOptions} />
         <Stack.Screen name="login" options={defaultHeaderOptions} />
         <Stack.Screen name="register" options={defaultHeaderOptions}/>
+        <Stack.Screen name="home" options={defaultHeaderOptions}/>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" options={defaultHeaderOptions} />
+        <Stack.Screen name="postDetail" options={defaultHeaderOptions} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
   );
 }
+
+export { defaultHeaderOptions };

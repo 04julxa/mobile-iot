@@ -60,10 +60,10 @@ function loginPage() {
                 </View>
 
             </View>
-            <TouchableOpacity style={styles.loginButton} onPress={() => { replacePath('/login') }}>
-                <Text style={{ color: 'black' }}>Entrar</Text>
+            <TouchableOpacity style={styles.loginButton} onPress={() => router.push('/login')}>
+                <Text style={{ color: 'black' }}>Se cadastrar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.registerButton} onPress={() => { replacePath('/welcome') }}>
+            <TouchableOpacity style={styles.registerButton} onPress={() => router.push('/welcome')}>
                 <Text style={{ color: 'black' }}>Voltar</Text>
             </TouchableOpacity>
         </LinearGradient>

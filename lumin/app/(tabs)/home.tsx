@@ -1,15 +1,18 @@
 import React, {Component} from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList, ScrollView } from 'react-native';
 import Post from '../../components/src/Post';
 
-class Home extends Component {
-    state = {
+export default function Home() {
+    const state = {
         posts: [
             {
                 id: Math.random(),
                 nickname: 'Evelyn Julia',
+                icon: require('../../assets/images/deer.jpeg'),
                 email: 'evelynjulia945@gmail.com',
-                image: require('../../assets/images/lumin-bluelogo.png'),
+                username: 'evelynjulia',
+                content: "viado na mata",
+                image: require('../../assets/images/deer.jpeg'),
                 comments: [{
                     nickname: 'sssss',
                     comment: '!11!'
@@ -21,8 +24,11 @@ class Home extends Component {
                 {
                     id: Math.random(),
                     nickname: 'Jessy',
+                    icon: require('../../assets/images/deer.jpeg'),
                     email: 'jessicavlb2005@gmail.com',
-                    image: require('../../assets/images/lumin-bluelogo.png'),
+                    username: 'woobot',
+                    content: "evelyn é homofobica? cancelem ela",
+                    image: null,
                     comments: [{
                         nickname: 'Tiago',
                         comment: 'kaiojwd'
@@ -34,8 +40,11 @@ class Home extends Component {
                     {
                         id: Math.random(),
                         nickname: 'Felipe',
+                        icon: require('../../assets/images/deer.jpeg'),
                         email: 'Felipe000@gmail.com',
-                        image: require('../../assets/images/lumin-bluelogo.png'),
+                        username: 'felipe000',
+                        content: null,
+                        image: require('../../assets/images/brisa.jpg'),
                         comments: [{
                             nickname: 'Evelyn',
                             comment: 'jjjjjjjjjjj'
@@ -47,17 +56,18 @@ class Home extends Component {
             }]
     }
 
-    render () {
-        return (
-            <View style={styles.container}>
-                <FlatList
-                    data={this.state.posts}
-                    keyExtractor={item=>`${item.id}`}
-                    renderItem={({item}) =>
-                        <Post key={item.id} {...item} />} />
-            </View>
-        )
-    }
+    return (
+        <View style={styles.container}>
+            <ScrollView style={{width: '100%'}}>
+                {
+                    state.posts.map((item) => {
+                        return <Post key={item.id} {...item} />
+                    })
+                }
+            </ScrollView>
+                    
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({
@@ -65,8 +75,8 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#F5FCFF'
+        backgroundColor: 'red',
+        width: '100%'
+        
     }
 })
-
-export default Home

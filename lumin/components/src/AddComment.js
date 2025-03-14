@@ -1,3 +1,4 @@
+import { AntDesign } from '@expo/vector-icons';
 import React, { Component } from 'react';
 import { Text, View, StyleSheet, TextInput, TouchableWithoutFeedback as TWF, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -23,7 +24,7 @@ class AddComment extends Component {
                         onChangeText={comment => this.setState({ comment })}
                         onSubmitEditing={this.handleAddComment} />
                     <TWF onPress={() => this.setState({ editMode: false })}>
-                        <Icon name='times' size={15} color='#02DBFF' />
+                        <Icon name='times' size={15} color='#FFF' />
                     </TWF>
                 </View>
             );
@@ -31,10 +32,7 @@ class AddComment extends Component {
             commentArea = (
                 <TWF onPress={() => this.setState({ editMode: true })}>
                     <View style={styles.container}>
-                        <Icon name='comment-o' size={25} color='#02DBFF' />
-                        <Text style={styles.caption}>
-                            Adicione um comentário...
-                        </Text>
+                        <Icon name='comment-o' size={28} color='#FFF' />
                     </View>
                 </TWF>
             );
@@ -60,7 +58,7 @@ const styles = StyleSheet.create({
     caption: {
         marginLeft: 10,
         fontSize: 14,
-        color: '#02DBFF',
+        color: '#FFF',
     },
     input: {
         width: '85%', 
