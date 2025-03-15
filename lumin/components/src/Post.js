@@ -10,7 +10,6 @@ export default function Post(props) {
         checkIfBookmarked();
     }, []);
 
-    // Verifica se o post já está salvo no AsyncStorage
     const checkIfBookmarked = async () => {
         try {
             const savedBookmarks = await AsyncStorage.getItem('bookmarks');
@@ -55,29 +54,29 @@ export default function Post(props) {
                 <Card.Title
                     title={
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Avatar.Image source={props.icon} size={40} style={{ backgroundColor: 'white', marginTop: 30, marginLeft: -5 }} />
-                            <Text style={{ marginLeft: 8.5, marginBottom: -10 }}>
+                            <Avatar.Image source={props.icon} size={40} style={{ backgroundColor: 'white', marginTop: 5, marginLeft: -5 }} />
+                            <Text style={{ marginLeft: 8.5, marginTop: -15 }}>
                                 <Text style={{ fontWeight: 'bold' }}>{props.nickname}</Text> <Text style={{ color: 'gray' }}>@{props.username}</Text>
                             </Text>
                         </View>
                     }
                     right={(props) => (
-                        <IconButton {...props} icon="dots-vertical" size={15} onPress={() => { }} style={{ color: 'gray', marginRight: 10, marginBottom: 0 }} />
+                        <IconButton {...props} icon="dots-vertical" size={15} onPress={() => { }} style={{ color: 'gray', marginRight: 10, marginTop: -10 }} />
                     )}
                     style={{ marginBottom: -25 }}
                 />
 
                 {props.content && (
-                    <Card.Content style={{ marginLeft: 44, paddingVertical: 4, marginBottom: -5 }}>
+                    <Card.Content style={{ marginLeft: 44, paddingVertical: 4, marginTop: -13 }}>
                         <Text variant="bodyMedium">{props.content}</Text>
                     </Card.Content>
                 )}
 
                 {props.image && (
-                    <Card.Cover source={props.image} style={{ width: '79%', alignSelf: "flex-end", marginRight: 20, marginTop: 10 }} />
+                    <Card.Cover source={props.image} style={{ width: '79%', alignSelf: "flex-end", marginRight: 20, marginTop: 5 }} />
                 )}
 
-                <Card.Actions style={{ alignSelf: 'flex-end' }}>
+                <Card.Actions style={{ alignSelf: 'flex-end', marginTop: -10, marginBottom: -10}}>
                     <IconButton
                         icon="comment-outline"
                         size={18}

@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
 import { Divider } from 'react-native-paper';
-import Author from '../components/src/Author';
 import Comments from '../components/src/Comments';
 
 import { RouteProp } from '@react-navigation/native';
