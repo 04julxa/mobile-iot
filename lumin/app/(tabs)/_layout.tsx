@@ -5,6 +5,7 @@ import { Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import MenuHeader from '@/components/MenuHeader';
 import { PaperProvider } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function TabLayout() {
   return (
@@ -15,14 +16,16 @@ export default function TabLayout() {
             backgroundColor: '#222325',
           },
           tabBarActiveTintColor: '#02DBFF',
-          tabBarInactiveTintColor: '#02DBFF',
+          tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.5)',
         }}
       >
         <Tabs.Screen
           name="home"
           options={{
             title: 'Feed',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+            tabBarIcon: ({ focused }) => (
+              <IconSymbol size={28} name="house.fill" color={focused ? '#02DBFF' : 'white'} />
+            ),
             headerRight: () => <MenuHeader />,
             headerTitle: () => (
               <Image
@@ -32,10 +35,7 @@ export default function TabLayout() {
             ),
             headerTitleAlign: 'center',
             headerBackground: () => (
-              <LinearGradient
-                colors={['#02EFFA', '#02DBFF', '#02F1FB']}
-                style={{ flex: 1 }}
-              />
+              <LinearGradient colors={['#02EFFA', '#02DBFF', '#02F1FB']} style={{ flex: 1 }} />
             ),
             headerStyle: {
               height: 70,
@@ -43,10 +43,12 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="cart"
+          name="bookmark"
           options={{
-            title: 'Cart',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+            title: 'Salvos',
+            tabBarIcon: ({ focused }) => (
+              <MaterialCommunityIcons size={28} name="bookmark" color={focused ? '#02DBFF' : 'white'} />
+            ),
             headerRight: () => <MenuHeader />,
             headerTitle: () => (
               <Image
@@ -56,10 +58,7 @@ export default function TabLayout() {
             ),
             headerTitleAlign: 'center',
             headerBackground: () => (
-              <LinearGradient
-                colors={['#02EFFA', '#02DBFF', '#02F1FB']}
-                style={{ flex: 1 }}
-              />
+              <LinearGradient colors={['#02EFFA', '#02DBFF', '#02F1FB']} style={{ flex: 1 }} />
             ),
             headerStyle: {
               height: 70,
@@ -70,7 +69,9 @@ export default function TabLayout() {
           name="profile"
           options={{
             title: 'Profile',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+            tabBarIcon: ({ focused }) => (
+              <MaterialCommunityIcons size={28} name="account" color={focused ? '#02DBFF' : 'white'} />
+            ),
             headerRight: () => <MenuHeader />,
             headerTitle: () => (
               <Image
@@ -80,10 +81,7 @@ export default function TabLayout() {
             ),
             headerTitleAlign: 'center',
             headerBackground: () => (
-              <LinearGradient
-                colors={['#02EFFA', '#02DBFF', '#02F1FB']}
-                style={{ flex: 1 }}
-              />
+              <LinearGradient colors={['#02EFFA', '#02DBFF', '#02F1FB']} style={{ flex: 1 }} />
             ),
             headerStyle: {
               height: 70,
