@@ -36,7 +36,7 @@ export default function Home() {
             icon: require('../../assets/images/guitarcat.jpg'),
             email: 'Felipe000@gmail.com',
             username: 'guitarlipe',
-            content: "travis kelce passou anos sendo um dos melhores TEs da liga, aí começou a namorar a loira lá e agora tem gente q acha q ele só é 'o namorado da taylor' 💀 irmão, o cara tem 3 anéis e recebe passe do mahomes, respeito kkkk",
+            content: "travis passou anos sendo um dos melhores TEs da liga, aí começou a namorar a loira lá e agora tem gente q acha q ele só é 'o namorado da taylor' 💀 irmão, o cara tem 3 anéis e recebe passe do mahomes, respeito kkkk",
             image: null,
             comments: [
                 { nickname: 'Evelyn', comment: 'jjjjjjjjjjj' },

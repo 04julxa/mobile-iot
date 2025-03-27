@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Avatar, Card, Text, IconButton, Divider } from 'react-native-paper';
+import React, { useState, useEffect } from 'react'; 
+import { Avatar, Card, Text, IconButton, Divider } from 'react-native-paper'; 
 import { View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 export default function Post(props) {
     const [bookmarked, setBookmarked] = useState(false);
 
@@ -20,17 +19,17 @@ export default function Post(props) {
         }
     };
 
-    // Adiciona ou remove o post dos bookmarks
     const toggleBookmark = async () => {
         try {
+
+            // aqui a gente ta recuperando os post salvo
             const savedBookmarks = await AsyncStorage.getItem('bookmarks');
             let bookmarks = savedBookmarks ? JSON.parse(savedBookmarks) : [];
 
+    
             if (bookmarked) {
-                // Remove o post dos bookmarks
                 bookmarks = bookmarks.filter(post => post.id !== props.id);
             } else {
-                // Adiciona o post aos bookmarks
                 bookmarks.push({
                     id: props.id,
                     nickname: props.nickname,

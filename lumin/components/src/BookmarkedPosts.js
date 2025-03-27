@@ -1,13 +1,14 @@
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, ScrollView, StyleSheet, Text } from 'react-native';
+import { View, ScrollView, StyleSheet, Text } from 'react-native'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Post from './Post';
+
 
 export default function BookmarkedPosts() {
     const [bookmarkedPosts, setBookmarkedPosts] = useState([]);
 
-    // Recarrega os posts salvos sempre que a tela for acessada
+
     useFocusEffect(
         useCallback(() => {
             loadBookmarks();

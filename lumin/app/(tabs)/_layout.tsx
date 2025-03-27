@@ -65,27 +65,14 @@ export default function TabLayout() {
             },
           }}
         />
-        <Tabs.Screen
+               <Tabs.Screen
           name="profile"
           options={{
             title: 'Profile',
             tabBarIcon: ({ focused }) => (
               <MaterialCommunityIcons size={28} name="account" color={focused ? '#02DBFF' : 'white'} />
             ),
-            headerRight: () => <MenuHeader />,
-            headerTitle: () => (
-              <Image
-                source={require('../../assets/images/lumin-blacklogo.png')}
-                style={{ width: 100, height: 40, resizeMode: 'contain' }}
-              />
-            ),
-            headerTitleAlign: 'center',
-            headerBackground: () => (
-              <LinearGradient colors={['#02EFFA', '#02DBFF', '#02F1FB']} style={{ flex: 1 }} />
-            ),
-            headerStyle: {
-              height: 70,
-            },
+            headerShown: false,
           }}
         />
       </Tabs>

@@ -14,5 +14,5 @@
     ".expo/types/**/*.ts",
   "expo-env.d.ts",
   "components/src/Post.tsx"
-]
+, "app/(tabs)/profile2.js"]
 }
