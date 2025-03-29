@@ -1,9 +1,23 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import React, {useState} from 'react';
+import { 
+  View, 
+  StyleSheet, 
+  ScrollView, 
+  SafeAreaView, 
+  Modal, 
+  Text, 
+  TouchableOpacity, 
+  TextInput,
+  Image 
+} from 'react-native';
 import Post from '../../components/src/Post';
+import { FAB, Icon } from 'react-native-elements';
+import CreatePostModal from '../../components/src/CreatePostModal';
 
 export default function Home() {
-    const posts = [
+    const [modalVisible, setModalVisible] = useState(false);
+    const [postText, setPostText] = useState('');
+    const [posts, setPosts] = useState([
         {
             id: 1,
             nickname: 'eve',
@@ -55,8 +69,7 @@ export default function Home() {
             comments: [
                 { nickname: 'Evelyn', comment: 'jjjjjjjjjjj' },
                 { nickname: 'Jessy', comment: 'jdjwejj' }
-            ]
-        },
+            ]},
 
         {
             id: 5,
@@ -85,10 +98,39 @@ export default function Home() {
                 { nickname: 'Jessy', comment: 'jdjwejj' }
             ]
         }
-    ];
+    ]);
+    const handleNewPost = (postContent: string) => {
+        const newPost = {
+            id: posts.length + 1,
+            nickname: 'Você',
+            icon: require('../../assets/images/abihobbs.jpeg'),
+            email: 'user@example.com',
+            username: 'seu_usuario',
+            content: postContent,
+            image: null,
+            comments: []
+        };
+        
+        setPosts([newPost, ...posts]);
+    };
 
     return (
         <SafeAreaView style={styles.safeArea}>
+            {/* FAB que abre o modal */}
+            <FAB
+                color="#4B7CCC"
+                placement="right"
+                style={styles.fab}
+                onPress={() => setModalVisible(true)}
+                icon={<Icon name="add" type="material" color="white" />}
+            />
+
+            <CreatePostModal
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                onSubmit={handleNewPost}
+            />
+
             <ScrollView style={styles.scrollView} contentContainerStyle={{ flexGrow: 1 }}>
                 {posts.map((item) => (
                     <Post key={item.id} {...item} />
@@ -105,5 +147,11 @@ const styles = StyleSheet.create({
     },
     scrollView: {
         width: '100%'
+    },
+    fab: {
+        position: 'absolute',
+        bottom: 30,
+        right: 8,
+        zIndex: 10
     }
 });

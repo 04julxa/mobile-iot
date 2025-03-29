@@ -22,7 +22,7 @@ const defaultHeaderOptions = {
   headerTitleAlign: 'center' as 'center',
   headerBackground: () => (
     <LinearGradient
-      colors={["#02EFFA", "#02DBFF", "#02F1FB"]}
+      colors={["#4B7CCC", "#4B7CCC", "#4B7CCC"]}
       style={{ flex: 1 }}
     />
   ),

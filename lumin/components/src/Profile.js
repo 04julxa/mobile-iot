@@ -9,19 +9,20 @@ import {
     StyleSheet
 } from "react-native";
 import {Divider } from 'react-native-paper'; 
-import {BlurView} from '@react-native-community/blur'
+import { BlurView } from 'expo-blur';
 
 const HEADER_MAX_HEIGHT = 120;
 const HEADER_MIN_HEIGHT = 70;
 const PROFILE_IMAGE_MAX_HEIGHT = 80;
 const PROFILE_IMAGE_MIN_HEIGHT = 40;
+const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
 class Profile extends Component {
     constructor(props) {
         super(props);
         this.state = {
             scrollY: new Animated.Value(0),
-            shouldCover: false, // Novo estado para controlar o zIndex
+            shouldCover: false, 
             user: this.props.user || { 
                 id: 1,
                 nickname: 'eve',
@@ -35,7 +36,7 @@ class Profile extends Component {
     }
 
     componentDidMount() {
-        // Listener para controlar quando o header deve cobrir o conteúdo
+        // para controlar quando o header deve cobrir o conteúdo
         this.state.scrollY.addListener(({ value }) => {
             const threshold = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
             const shouldCover = value >= threshold;
@@ -59,17 +60,11 @@ class Profile extends Component {
             extrapolate: 'clamp'
         });
 
-        const headerBlurr = this.state.scrollY.interpolate({
-            inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
-            outputRange: [0.5, 1],
-            extrapolate: 'clamp'
-        });
-
-        const headerOpacity = this.state.scrollY.interpolate({
-            inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
-            outputRange: [0.5, 1],
-            extrapolate: 'clamp'
-        });
+        const blurOpacity = this.state.scrollY.interpolate({
+            inputRange: [0, HEADER_SCROLL_DISTANCE],
+            outputRange: [0, 1],
+            extrapolate: 'clamp',
+          });
 
         const profileHeight = this.state.scrollY.interpolate({
             inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
@@ -81,7 +76,7 @@ class Profile extends Component {
             inputRange: [
                 0, 
                 HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT, 
-                HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT + PROFILE_IMAGE_MIN_HEIGHT // Novo estágio para subir depois de diminuir
+                HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT + PROFILE_IMAGE_MIN_HEIGHT
             ],
             outputRange: [
                 HEADER_MAX_HEIGHT - (PROFILE_IMAGE_MAX_HEIGHT / 2),
@@ -103,11 +98,14 @@ class Profile extends Component {
                     }
 
                 ]}>
-
                     <Image 
                     source={user.headerImage} 
                     style={styles.profileImage}
                 />
+
+                <Animated.View style={[styles.blurOverlay, { opacity: blurOpacity }]}>
+                        <BlurView intensity={100} style={StyleSheet.absoluteFill} tint="dark" />
+                    </Animated.View>
 
                 </Animated.View>                
                 <ScrollView 
@@ -229,7 +227,7 @@ const styles = StyleSheet.create({
     },
 
     blurOverlay: {
-        ...StyleSheet.absoluteFillObject, // Ocupa toda a área do header
+        ...StyleSheet.absoluteFillObject
       }
 });
 

@@ -1,4 +1,3 @@
-// App.tsx
 import React from 'react';
 import { View } from 'react-native';
 import Profile from '../../components/src/Profile';

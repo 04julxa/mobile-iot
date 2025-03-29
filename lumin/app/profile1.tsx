@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {  Text, View,  StyleSheet,  Image, FlatList } from 'react-native';
-import Post from '../../components/src/Post'; 
+import Post from '../components/src/Post'; 
 
 class Profile extends Component {
   state = {
@@ -15,7 +15,7 @@ class Profile extends Component {
     return (
       <View style={styles.container}>
         <View style={styles.profileHeader}>
-          <Image source={require('../../assets/images/bonecazoiuda.jpg')} style={styles.avatar} />
+          <Image source={require('../assets/images/bonecazoiuda.jpg')} style={styles.avatar} />
           <View style={styles.userInfo}>
             <Text style={styles.nickname}>Evelyn Julia</Text>
             <Text style={styles.username}>@evlia04</Text>
@@ -34,7 +34,7 @@ class Profile extends Component {
               nickname={item.nickname}
               username={item.username}
               content={item.content}
-              icon={require('../../assets/images/bonecazoiuda.jpg')}
+              icon={require('../assets/images/bonecazoiuda.jpg')}
               image={item.image}
             />
           )}

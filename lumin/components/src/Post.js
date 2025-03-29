@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Avatar, Card, Text, IconButton, Divider } from 'react-native-paper'; 
 import { View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export default function Post(props) {
     const [bookmarked, setBookmarked] = useState(false);
 
@@ -48,7 +49,9 @@ export default function Post(props) {
     };
 
     return (
+        
         <React.Fragment>
+            
             <Card style={{ borderRadius: 0, backgroundColor: '#222325' }}>
                 <Card.Title
                     title={
@@ -74,6 +77,7 @@ export default function Post(props) {
                 {props.image && (
                     <Card.Cover source={props.image} style={{ width: '79%', alignSelf: "flex-end", marginRight: 20, marginTop: 5 }} />
                 )}
+                
 
                 <Card.Actions style={{ alignSelf: 'flex-end', marginTop: -10, marginBottom: -10}}>
                     <IconButton
@@ -105,6 +109,8 @@ export default function Post(props) {
                         theme={{ colors: { primary: 'white' } }}
                     />
                 </Card.Actions>
+
+                
 
             </Card>
             <Divider />

@@ -15,7 +15,7 @@ export default function TabLayout() {
           tabBarStyle: {
             backgroundColor: '#222325',
           },
-          tabBarActiveTintColor: '#02DBFF',
+          tabBarActiveTintColor: '#4B7CCC',
           tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.5)',
         }}
       >
@@ -24,7 +24,7 @@ export default function TabLayout() {
           options={{
             title: 'Feed',
             tabBarIcon: ({ focused }) => (
-              <IconSymbol size={28} name="house.fill" color={focused ? '#02DBFF' : 'white'} />
+              <IconSymbol size={28} name="house.fill" color={focused ? '#4B7CCC' : 'white'} />
             ),
             headerRight: () => <MenuHeader />,
             headerTitle: () => (
@@ -35,7 +35,7 @@ export default function TabLayout() {
             ),
             headerTitleAlign: 'center',
             headerBackground: () => (
-              <LinearGradient colors={['#02EFFA', '#02DBFF', '#02F1FB']} style={{ flex: 1 }} />
+              <LinearGradient colors={["#4B7CCC", "#4B7CCC", "#4B7CCC"]} style={{ flex: 1 }} />
             ),
             headerStyle: {
               height: 70,
@@ -47,7 +47,7 @@ export default function TabLayout() {
           options={{
             title: 'Salvos',
             tabBarIcon: ({ focused }) => (
-              <MaterialCommunityIcons size={28} name="bookmark" color={focused ? '#02DBFF' : 'white'} />
+              <MaterialCommunityIcons size={28} name="bookmark" color={focused ? '#4B7CCC' : 'white'} />
             ),
             headerRight: () => <MenuHeader />,
             headerTitle: () => (
@@ -58,7 +58,7 @@ export default function TabLayout() {
             ),
             headerTitleAlign: 'center',
             headerBackground: () => (
-              <LinearGradient colors={['#02EFFA', '#02DBFF', '#02F1FB']} style={{ flex: 1 }} />
+              <LinearGradient colors={["#4B7CCC", "#4B7CCC", "#4B7CCC"]} style={{ flex: 1 }} />
             ),
             headerStyle: {
               height: 70,
@@ -70,7 +70,7 @@ export default function TabLayout() {
           options={{
             title: 'Profile',
             tabBarIcon: ({ focused }) => (
-              <MaterialCommunityIcons size={28} name="account" color={focused ? '#02DBFF' : 'white'} />
+              <MaterialCommunityIcons size={28} name="account" color={focused ? "#4B7CCC" : 'white'} />
             ),
             headerShown: false,
           }}

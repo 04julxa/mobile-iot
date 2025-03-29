@@ -39,14 +39,14 @@ function LoginPage() {
 
     return (
         <LinearGradient
-            colors={["#18191A", "#222325", "#2D2E30", "#3A3B3C", "#222325"]}
+            colors={["#222325", '#222325']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{ flex: 1 }}>
             
             <View style={styles.formContainer}>
                 <View style={styles.logoContainer}>
-                    <MaterialCommunityIcons style={styles.logo} name="account-circle" size={34} color='#02DBFF' />
+                    <MaterialCommunityIcons style={styles.logo} name="account-circle" size={34} color='#4B7CCC' />
                     <Text style={styles.title}>Entre na sua conta</Text>
                 </View>
 
@@ -54,7 +54,7 @@ function LoginPage() {
                     onChangeText={(text) => setEmail({ value: text, dirty: true })} 
                     style={styles.input} 
                     placeholder="Email" 
-                    placeholderTextColor="#02DBFF" 
+                    placeholderTextColor="#4B7CCC" 
                     keyboardType="email-address"
                     autoCapitalize="none"
                 />
@@ -66,13 +66,13 @@ function LoginPage() {
                         style={styles.inputText} 
                         secureTextEntry={!isPasswordVisible} 
                         placeholder="Senha" 
-                        placeholderTextColor="#02DBFF" 
+                        placeholderTextColor="#4B7CCC" 
                     />
                     <TouchableOpacity 
                         style={styles.eyeIcon} 
                         onPress={() => setIsPasswordVisible(!isPasswordVisible)}
                     >
-                        <AntDesign name={isPasswordVisible ? "eyeo" : "eye"} size={24} color="#02DBFF" />
+                        <AntDesign name={isPasswordVisible ? "eyeo" : "eye"} size={24} color="#4B7CCC" />
                     </TouchableOpacity>
                 </View>
                 {handleErrorPassword()}
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
         width: '80%',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#02DBFF',
+        backgroundColor: '#4B7CCC',
         alignSelf: 'center'
     },
     registerButton: {
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
         width: '80%',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#02DBFF',
+        backgroundColor: '#4B7CCC',
         alignSelf: 'center'
     },
     logo: {
@@ -129,13 +129,12 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#02DBFF',
-        marginLeft: 10
+        color: '#4B7CCC'    
     },
     input: {
         height: 50,
         borderWidth: 1,
-        borderColor: '#02DBFF',
+        borderColor: '#4B7CCC',
         backgroundColor: 'transparent',
         borderRadius: 5,
         width: '80%',
@@ -143,12 +142,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginTop: 10,
         marginBottom: 10,
-        color: '#02DBFF'
+        color: '#4B7CCC'
     },
     passwordInput: {
         height: 50,
         borderWidth: 1,
-        borderColor: '#02DBFF',
+        borderColor: '#4B7CCC',
         backgroundColor: 'transparent',
         borderRadius: 5,
         width: '80%',
@@ -156,7 +155,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginTop: 10,
         marginBottom: 20,
-        color: '#02DBFF',
+        color: '#4B7CCC',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between'
@@ -165,7 +164,7 @@ const styles = StyleSheet.create({
         height: 50,
         width: '80%',
         fontSize: 16,
-        color: '#02DBFF'
+        color: '#4B7CCC'
     },
     eyeIcon: {
         marginLeft: 10,

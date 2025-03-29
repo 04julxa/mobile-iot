@@ -12,13 +12,13 @@ const welcome = () => {
     }
     return (
     <LinearGradient
-    colors={["#18191A", "#222325", "#2D2E30", "#3A3B3C", "#222325"]}
+    colors={["#222325", '#222325']}
     style={styles.container}
     start={{ x: 0, y: 0 }}
     end={{ x: 1, y: 1 }}>
         <View style={styles.formContainer}>
-            <Image source={require('../assets/images/lumin-bluelogo.png')} style={{ width: 100, height: 100, marginBottom: 20 }} />
-            <Text style={{color: '#02DBFF', fontSize: 24, marginTop: 50, marginBottom: 20, fontWeight: 'semibold'}}>Seja bem vindo!</Text>
+            <Image source={require('../assets/images/lumin-newblue-logo.png')} style={{ width: 100, height: 100, marginBottom: 20 }} />
+            <Text style={{color: '#4B7CCC', fontSize: 18, marginTop: 5, marginBottom: 20, fontWeight: 'semibold'}}>Conecte-se com o mundo!</Text>
         </View>
         <TouchableOpacity style={styles.loginButton} onPress={() => {replacePath('/login')}}>
             <Text style={{color: 'black', fontWeight: 'bold'}}>Login</Text>
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
         width: '80%',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#02DBFF',
+        backgroundColor: '#4B7CCC',
         alignSelf: 'center' 
     },
     registerButton: {
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
         width: '80%',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#02DBFF',
+        backgroundColor: '#4B7CCC',
         alignSelf: 'center'
     }
 })
