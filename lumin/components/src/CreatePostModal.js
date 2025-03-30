@@ -28,7 +28,6 @@ const CreatePostModal = ({ visible, onClose, onSubmit }) => {
       onRequestClose={onClose}
     >
       <View style={styles.modalContainer}>
-        {/* Header */}
         <View style={styles.modalHeader}>
           <TouchableOpacity 
             style={styles.backButton}
@@ -48,9 +47,7 @@ const CreatePostModal = ({ visible, onClose, onSubmit }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Corpo do post */}
         <ScrollView style={styles.modalContent}>
-          {/* Área do usuário */}
           <View style={styles.userArea}>
             <Image 
               source={require('../../assets/images/abihobbs.jpeg')}

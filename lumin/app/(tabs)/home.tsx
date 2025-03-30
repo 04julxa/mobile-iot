@@ -1,14 +1,8 @@
 import React, {useState} from 'react';
 import { 
-  View, 
   StyleSheet, 
   ScrollView, 
   SafeAreaView, 
-  Modal, 
-  Text, 
-  TouchableOpacity, 
-  TextInput,
-  Image 
 } from 'react-native';
 import Post from '../../components/src/Post';
 import { FAB, Icon } from 'react-native-elements';
@@ -27,8 +21,34 @@ export default function Home() {
             content: "saudade quando eu quebrava a aplicação dos outros ao invés de quebrar a minha",
             image: require('../../assets/images/evepost.jpeg'),
             comments: [
-                { nickname: 'sssss', comment: '!11!' },
-                { nickname: 'nome', comment: 'comentário' }
+                { 
+                    icon: require('../../assets/images/abihobbs.jpeg'),
+                    nickname: 'jessy',
+                    username: 'woobot',
+                    comment: "VC DEU PULL?",
+                    likes: 8,
+                    time: '2h',
+                    replyTo: 'evlia04'
+                },
+                { 
+                    icon: require('../../assets/images/carrobrega.jpg'),
+                    nickname: 'tiago',
+                    username: 'ogait',
+                    comment: "vdd, agora só quebra o próprio código mesmo",
+                    likes: 12,
+                    time: '1h',
+                    replyTo: 'evlia04'
+                },
+                { 
+                    icon: require('../../assets/images/bonecazoiuda.jpg'),
+                    nickname: 'eve',
+                    username: 'evlia04',
+                    comment: "morra tiago",
+                    likes: 10,
+                    time: '30min',
+                    replyTo: 'ogait'
+
+                }
             ]
         },
         {
@@ -40,8 +60,22 @@ export default function Home() {
             content: "terminei a primeira fase de mobile, já tá podendo assistir hannibal dnv?",
             image: null,
             comments: [
-                { nickname: 'Tiago', comment: 'kaiojwd' },
-                { nickname: 'Mateus sem H', comment: 'comentário 1' }
+                { 
+                    icon: require('../../assets/images/guitarcat.jpg'),
+                    nickname: 'lipe',
+                    username: 'guitarlipe',
+                    comment: "só se for pra estudar anatomia 🧠🔪",
+                    likes: 5,
+                    time: '4h'
+                },
+                { 
+                    icon: require('../../assets/images/casadoicon.png'),
+                    nickname: 'mateus sem h',
+                    username: 'homemcomprometido',
+                    comment: "assiste sim, mas só depois de commitar",
+                    likes: 3,
+                    time: '3h'
+                }
             ]
         },
         {
@@ -53,11 +87,24 @@ export default function Home() {
             content: "travis passou anos sendo um dos melhores TEs da liga, aí começou a namorar a loira lá e agora tem gente q acha q ele só é 'o namorado da taylor' 💀 irmão, o cara tem 3 anéis e recebe passe do mahomes, respeito kkkk",
             image: null,
             comments: [
-                { nickname: 'Evelyn', comment: 'jjjjjjjjjjj' },
-                { nickname: 'Jessy', comment: 'jdjwejj' }
+                { 
+                    icon: require('../../assets/images/carrobrega.jpg'),
+                    nickname: 'tiago',
+                    username: 'ogait',
+                    comment: "queria eu ser conhecido por ser namorado de uma loira",
+                    likes: 15,
+                    time: '6h'
+                },
+                { 
+                    icon: require('../../assets/images/bonecazoiuda.jpg'),
+                    nickname: 'eve',
+                    username: 'evlia04',
+                    comment: "pelo menos ele não tem que lidar com null safety no código dele 😂",
+                    likes: 10,
+                    time: '5h'
+                }
             ]
         },
-
         {
             id: 4,
             nickname: 'tiago',
@@ -67,10 +114,24 @@ export default function Home() {
             content: "@guitarlipe queria eu ser conhecido por ser namorado de uma loira",
             image: null,
             comments: [
-                { nickname: 'Evelyn', comment: 'jjjjjjjjjjj' },
-                { nickname: 'Jessy', comment: 'jdjwejj' }
-            ]},
-
+                { 
+                    icon: require('../../assets/images/ellietlou.jpeg'),
+                    nickname: 'Bruno Rafael',
+                    username: 'profbruno',
+                    comment: "Foco no código, pessoal! 😅",
+                    likes: 20,
+                    time: '2h'
+                },
+                { 
+                    icon: require('../../assets/images/abihobbs.jpeg'),
+                    nickname: 'jessy',
+                    username: 'woobot',
+                    comment: "só falta arrumar um date com a taylor swift agora",
+                    likes: 7,
+                    time: '1h'
+                }
+            ]
+        },
         {
             id: 5,
             nickname: 'mateus sem h',
@@ -80,11 +141,24 @@ export default function Home() {
             content: null,
             image: require('../../assets/images/casadopost.png'),
             comments: [
-                { nickname: 'Evelyn', comment: 'jjjjjjjjjjj' },
-                { nickname: 'Jessy', comment: 'jdjwejj' }
+                { 
+                    icon: require('../../assets/images/bonecazoiuda.jpg'),
+                    nickname: 'eve',
+                    username: 'evlia04',
+                    comment: "que foto linda do casal! 💍❤️",
+                    likes: 25,
+                    time: '8h'
+                },
+                { 
+                    icon: require('../../assets/images/guitarcat.jpg'),
+                    nickname: 'lipe',
+                    username: 'guitarlipe',
+                    comment: "parabéns aos noivos! 🎉",
+                    likes: 18,
+                    time: '7h'
+                }
             ]
         },
-
         {
             id: 6,
             nickname: 'Bruno Rafael',
@@ -94,8 +168,22 @@ export default function Home() {
             content: "Essa entrega tá merecendo um 3, muito bom",
             image: null,
             comments: [
-                { nickname: 'Evelyn', comment: 'jjjjjjjjjjj' },
-                { nickname: 'Jessy', comment: 'jdjwejj' }
+                { 
+                    icon: require('../../assets/images/abihobbs.jpeg'),
+                    nickname: 'jessy',
+                    username: 'woobot',
+                    comment: "professor, e se a gente fizer em Kotlin? 😇",
+                    likes: 12,
+                    time: '3h'
+                },
+                { 
+                    icon: require('../../assets/images/carrobrega.jpg'),
+                    nickname: 'tiago',
+                    username: 'ogait',
+                    comment: "3 é pouco, pede 10 pra ele 😎",
+                    likes: 9,
+                    time: '2h'
+                }
             ]
         }
     ]);
@@ -116,7 +204,6 @@ export default function Home() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            {/* FAB que abre o modal */}
             <FAB
                 color="#4B7CCC"
                 placement="right"

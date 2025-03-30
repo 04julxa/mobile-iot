@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import {Divider } from 'react-native-paper'; 
 import { BlurView } from 'expo-blur';
+import Post from './Post'
 
 const HEADER_MAX_HEIGHT = 120;
 const HEADER_MIN_HEIGHT = 70;
@@ -40,6 +41,30 @@ class Profile extends Component {
         this.state.scrollY.addListener(({ value }) => {
             const threshold = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
             const shouldCover = value >= threshold;
+
+            posts: [ 
+                {
+                id: 1,
+                nickname: 'eve',
+                icon: require('../../assets/images/bonecazoiuda.jpg'),
+                email: 'evelynjulia945@gmail.com',
+                username: 'evlia04',
+                content: "saudade quando eu quebrava a aplicação dos outros ao invés de quebrar a minha",
+                image: require('../../assets/images/evepost.jpeg'),
+                  comments: [
+                    {
+                      nickname: "amigo1",
+                      username: "amigo_dev",
+                      icon: null,
+                      comment: "Parabéns pelo post! 👏",
+                      likes: 5,
+                      time: "2h",
+                      replyTo: 'evlia04'
+                    }
+                  ]
+                },
+                
+              ]
             
             if (shouldCover !== this.state.shouldCover) {
                 this.setState({ shouldCover });
@@ -150,7 +175,21 @@ class Profile extends Component {
 
                     <Divider></Divider>
 
+                    {this.state.user.posts.map(post => (
+                        <Post
+                        key={post.id}
+                        id={post.id}
+                        nickname={this.state.user.nickname}
+                        username={this.state.user.username}
+                        icon={this.state.user.icon}
+                        content={post.content}
+                        image={post.image}
+                        comments={post.comments}
+                    />
+                ))}
+
                     <View style={{ height: 800 }}></View>
+
                 </ScrollView>
             </SafeAreaView>
         );
