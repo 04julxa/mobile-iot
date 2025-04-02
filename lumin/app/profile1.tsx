@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {  Text, View,  StyleSheet,  Image, FlatList } from 'react-native';
-import Post from '../components/src/Post'; 
+import {Post} from '../components/src/Post'
 
 class Profile extends Component {
   state = {

@@ -1,244 +1,287 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   StyleSheet, 
-  ScrollView, 
   SafeAreaView, 
+  ActivityIndicator,
+  Alert,
+  Text,
+  FlatList,
+  RefreshControl,
+  View
 } from 'react-native';
-import Post from '../../components/src/Post';
-import { FAB, Icon } from 'react-native-elements';
+import { FAB } from 'react-native-elements';
+import { Post } from '../../components/src/Post';
 import CreatePostModal from '../../components/src/CreatePostModal';
+import { ViewPostModal } from '../../components/src/ViewPostModal';
+
+interface Author {
+  _id: string;
+  name: string;
+  username: string;
+  email: string;
+}
+
+interface Post {
+  _id: string;
+  content: string;
+  author: Author;
+  icon?: any;
+  image?: any;
+  likes?: any[];
+  comments?: any[];
+  createdAt?: string;
+  onPress?: () => void;
+  likesCount?: number;
+  reposts?: number; 
+}
 
 export default function Home() {
-    const [modalVisible, setModalVisible] = useState(false);
-    const [postText, setPostText] = useState('');
-    const [posts, setPosts] = useState([
-        {
-            id: 1,
-            nickname: 'eve',
-            icon: require('../../assets/images/bonecazoiuda.jpg'),
-            email: 'evelynjulia945@gmail.com',
-            username: 'evlia04',
-            content: "saudade quando eu quebrava a aplicação dos outros ao invés de quebrar a minha",
-            image: require('../../assets/images/evepost.jpeg'),
-            comments: [
-                { 
-                    icon: require('../../assets/images/abihobbs.jpeg'),
-                    nickname: 'jessy',
-                    username: 'woobot',
-                    comment: "VC DEU PULL?",
-                    likes: 8,
-                    time: '2h',
-                    replyTo: 'evlia04'
-                },
-                { 
-                    icon: require('../../assets/images/carrobrega.jpg'),
-                    nickname: 'tiago',
-                    username: 'ogait',
-                    comment: "vdd, agora só quebra o próprio código mesmo",
-                    likes: 12,
-                    time: '1h',
-                    replyTo: 'evlia04'
-                },
-                { 
-                    icon: require('../../assets/images/bonecazoiuda.jpg'),
-                    nickname: 'eve',
-                    username: 'evlia04',
-                    comment: "morra tiago",
-                    likes: 10,
-                    time: '30min',
-                    replyTo: 'ogait'
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [viewModalVisible, setViewModalVisible] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
-                }
-            ]
+  const API_BASE_URL = 'http://10.0.2.2:3001/api';
+
+  const fetchPosts = useCallback(async () => {
+    try {
+      setError(null);
+      const response = await fetch(`${API_BASE_URL}/post`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      const simplifiedPosts = result.data.map((post: Post) => ({
+        _id: post._id,
+        content: post.content,
+        author: post.author || {
+          _id: '',
+          name: 'Anônimo',
+          username: '',
+          email: ''
         },
-        {
-            id: 2,
-            nickname: 'jessy',
-            icon: require('../../assets/images/abihobbs.jpeg'),
-            email: 'jessicavlb2005@gmail.com',
-            username: 'woobot',
-            content: "terminei a primeira fase de mobile, já tá podendo assistir hannibal dnv?",
-            image: null,
-            comments: [
-                { 
-                    icon: require('../../assets/images/guitarcat.jpg'),
-                    nickname: 'lipe',
-                    username: 'guitarlipe',
-                    comment: "só se for pra estudar anatomia 🧠🔪",
-                    likes: 5,
-                    time: '4h'
-                },
-                { 
-                    icon: require('../../assets/images/casadoicon.png'),
-                    nickname: 'mateus sem h',
-                    username: 'homemcomprometido',
-                    comment: "assiste sim, mas só depois de commitar",
-                    likes: 3,
-                    time: '3h'
-                }
-            ]
-        },
-        {
-            id: 3,
-            nickname: 'lipe',
-            icon: require('../../assets/images/guitarcat.jpg'),
-            email: 'Felipe000@gmail.com',
-            username: 'guitarlipe',
-            content: "travis passou anos sendo um dos melhores TEs da liga, aí começou a namorar a loira lá e agora tem gente q acha q ele só é 'o namorado da taylor' 💀 irmão, o cara tem 3 anéis e recebe passe do mahomes, respeito kkkk",
-            image: null,
-            comments: [
-                { 
-                    icon: require('../../assets/images/carrobrega.jpg'),
-                    nickname: 'tiago',
-                    username: 'ogait',
-                    comment: "queria eu ser conhecido por ser namorado de uma loira",
-                    likes: 15,
-                    time: '6h'
-                },
-                { 
-                    icon: require('../../assets/images/bonecazoiuda.jpg'),
-                    nickname: 'eve',
-                    username: 'evlia04',
-                    comment: "pelo menos ele não tem que lidar com null safety no código dele 😂",
-                    likes: 10,
-                    time: '5h'
-                }
-            ]
-        },
-        {
-            id: 4,
-            nickname: 'tiago',
-            icon: require('../../assets/images/carrobrega.jpg'),
-            email: 'tiagosousa@gmail.com',
-            username: 'ogait',
-            content: "@guitarlipe queria eu ser conhecido por ser namorado de uma loira",
-            image: null,
-            comments: [
-                { 
-                    icon: require('../../assets/images/ellietlou.jpeg'),
-                    nickname: 'Bruno Rafael',
-                    username: 'profbruno',
-                    comment: "Foco no código, pessoal! 😅",
-                    likes: 20,
-                    time: '2h'
-                },
-                { 
-                    icon: require('../../assets/images/abihobbs.jpeg'),
-                    nickname: 'jessy',
-                    username: 'woobot',
-                    comment: "só falta arrumar um date com a taylor swift agora",
-                    likes: 7,
-                    time: '1h'
-                }
-            ]
-        },
-        {
-            id: 5,
-            nickname: 'mateus sem h',
-            icon: require('../../assets/images/casadoicon.png'),
-            email: 'mateuspatricio@gmail.com',
-            username: 'homemcomprometido',
-            content: null,
-            image: require('../../assets/images/casadopost.png'),
-            comments: [
-                { 
-                    icon: require('../../assets/images/bonecazoiuda.jpg'),
-                    nickname: 'eve',
-                    username: 'evlia04',
-                    comment: "que foto linda do casal! 💍❤️",
-                    likes: 25,
-                    time: '8h'
-                },
-                { 
-                    icon: require('../../assets/images/guitarcat.jpg'),
-                    nickname: 'lipe',
-                    username: 'guitarlipe',
-                    comment: "parabéns aos noivos! 🎉",
-                    likes: 18,
-                    time: '7h'
-                }
-            ]
-        },
-        {
-            id: 6,
-            nickname: 'Bruno Rafael',
-            icon: require('../../assets/images/ellietlou.jpeg'),
-            email: 'brunorafael@unifacisa.com',
-            username: 'profbruno',
-            content: "Essa entrega tá merecendo um 3, muito bom",
-            image: null,
-            comments: [
-                { 
-                    icon: require('../../assets/images/abihobbs.jpeg'),
-                    nickname: 'jessy',
-                    username: 'woobot',
-                    comment: "professor, e se a gente fizer em Kotlin? 😇",
-                    likes: 12,
-                    time: '3h'
-                },
-                { 
-                    icon: require('../../assets/images/carrobrega.jpg'),
-                    nickname: 'tiago',
-                    username: 'ogait',
-                    comment: "3 é pouco, pede 10 pra ele 😎",
-                    likes: 9,
-                    time: '2h'
-                }
-            ]
-        }
-    ]);
-    const handleNewPost = (postContent: string) => {
-        const newPost = {
-            id: posts.length + 1,
-            nickname: 'Você',
-            icon: require('../../assets/images/abihobbs.jpeg'),
-            email: 'user@example.com',
-            username: 'seu_usuario',
-            content: postContent,
-            image: null,
-            comments: []
-        };
-        
-        setPosts([newPost, ...posts]);
+        likes: Array.isArray(post.likes) ? post.likes : [],
+        comments: Array.isArray(post.comments) ? post.comments : [],
+        createdAt: post.createdAt || ''
+      }));
+      
+      setPosts(simplifiedPosts);
+    } catch (error) {
+      console.error('Erro ao buscar posts:', error);
+      setError(error instanceof Error ? error.message : 'Erro desconhecido');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchPosts();
+  }, [fetchPosts]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
+
+  const handleNewPost = useCallback(async (postContent: string) => {
+    const newPost = {
+      content: postContent,
+      author: {
+        _id: "123456",
+        name: "Você",
+        username: "seu_usuario",
+        email: "user@example.com"
+      },
+      likes: [],
+      comments: []
     };
 
+    try {
+      const response = await fetch(`${API_BASE_URL}/post`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newPost)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      setPosts(prevPosts => [result.data, ...prevPosts]);
+      setCreateModalVisible(false);
+      Alert.alert('Sucesso', 'Post criado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao criar post:', error);
+      Alert.alert(
+        'Erro', 
+        `Falha ao criar post: ${error instanceof Error ? error.message : 'Erro desconhecido'}`
+      );
+    }
+  }, []);
+
+  const handleViewPost = useCallback((post: Post) => {
+    setSelectedPost(post);
+    setViewModalVisible(true);
+  }, []);
+
+  const handleCloseViewModal = useCallback(() => {
+    setViewModalVisible(false);
+    setSelectedPost(null);
+  }, []);
+
+  if (loading && !refreshing) {
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <FAB
-                color="#4B7CCC"
-                placement="right"
-                style={styles.fab}
-                onPress={() => setModalVisible(true)}
-                icon={<Icon name="add" type="material" color="white" />}
-            />
-
-            <CreatePostModal
-                visible={modalVisible}
-                onClose={() => setModalVisible(false)}
-                onSubmit={handleNewPost}
-            />
-
-            <ScrollView style={styles.scrollView} contentContainerStyle={{ flexGrow: 1 }}>
-                {posts.map((item) => (
-                    <Post key={item.id} {...item} />
-                ))}
-            </ScrollView>
-        </SafeAreaView>
+      <SafeAreaView style={styles.safeArea}>
+        <ActivityIndicator size="large" color="#4B7CCC" style={styles.loader} />
+      </SafeAreaView>
     );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <FAB
+            title="Tentar novamente"
+            onPress={fetchPosts}
+            buttonStyle={styles.retryButton}
+            titleStyle={styles.retryButtonText}
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => (
+          <Post 
+            {...item} 
+            id={item._id}
+            nickname={item.author.name}
+            username={item.author.username}
+            onPress={() => handleViewPost(item)}
+          />
+        )}
+        contentContainerStyle={styles.listContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={['#4B7CCC']}
+            tintColor="#4B7CCC"
+          />
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Nenhum post encontrado</Text>
+            <FAB
+              title="Recarregar"
+              onPress={fetchPosts}
+              buttonStyle={styles.reloadButton}
+              titleStyle={styles.reloadButtonText}
+            />
+          </View>
+        }
+      />
+
+      <FAB
+        color="#4B7CCC"
+        placement="right"
+        style={styles.fab}
+        onPress={() => setCreateModalVisible(true)}
+        icon={{ name: "add", color: "white" }}
+      />
+
+      <CreatePostModal
+        visible={createModalVisible}
+        onClose={() => setCreateModalVisible(false)}
+        onSubmit={handleNewPost}
+      />
+
+      <ViewPostModal
+        visible={viewModalVisible}
+        post={selectedPost}
+        onClose={handleCloseViewModal}
+        isBookmarked={false}
+        onBookmarkPress={() => console.log('Bookmark toggled')} 
+        isFollowing={false} 
+        toggleFollow={() => console.log('Follow toggled')}
+      />
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: '#222325'
-    },
-    scrollView: {
-        width: '100%'
-    },
-    fab: {
-        position: 'absolute',
-        bottom: 30,
-        right: 8,
-        zIndex: 10
-    }
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#222325'
+  },
+  loader: {
+    marginTop: 20
+  },
+  listContent: {
+    paddingBottom: 80,
+    flexGrow: 1
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    right: 8,
+    zIndex: 10
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20
+  },
+  errorText: {
+    color: 'white',
+    textAlign: 'center',
+    marginBottom: 20,
+    fontSize: 16
+  },
+  retryButton: {
+    backgroundColor: '#4B7CCC',
+    borderRadius: 8,
+    paddingHorizontal: 20
+  },
+  retryButtonText: {
+    color: 'white',
+    fontSize: 16
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20
+  },
+  emptyText: {
+    color: 'white',
+    textAlign: 'center',
+    marginBottom: 20,
+    fontSize: 16
+  },
+  reloadButton: {
+    backgroundColor: '#4B7CCC',
+    borderRadius: 8,
+    paddingHorizontal: 20
+  },
+  reloadButtonText: {
+    color: 'white',
+    fontSize: 16
+  }
 });

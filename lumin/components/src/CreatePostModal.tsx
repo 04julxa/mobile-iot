@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { 
   View, 
   Modal, 
@@ -11,14 +11,34 @@ import {
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 
-const CreatePostModal = ({ visible, onClose, onSubmit }) => {
+interface CreatePostModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onSubmit: (postText: string) => void;
+  userImage?: string;
+  post?: any; 
+  isBookmarked?: boolean; 
+  onBookmarkPress?: () => void; 
+
+}
+
+const CreatePostModal: React.FC<CreatePostModalProps> = React.memo(({ 
+  visible, 
+  onClose, 
+  onSubmit,
+  userImage = require('../../assets/images/abihobbs.jpeg')
+}) => {
   const [postText, setPostText] = useState('');
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     onSubmit(postText);
     setPostText('');
     onClose();
-  };
+  }, [postText, onSubmit, onClose]);
+
+  const handleTextChange = useCallback((text: string) => {
+    setPostText(text);
+  }, []);
 
   return (
     <Modal
@@ -32,14 +52,18 @@ const CreatePostModal = ({ visible, onClose, onSubmit }) => {
           <TouchableOpacity 
             style={styles.backButton}
             onPress={onClose}
+            accessibilityLabel="Fechar modal"
           >
             <Icon name="arrow-back" type="material" color="#4B7CCC" size={24} />
           </TouchableOpacity>
+          
           <Text style={styles.modalTitle}>Criar publicação</Text>
+          
           <TouchableOpacity 
-            style={styles.postButton}
+            style={[styles.postButton, !postText.trim() && styles.disabledButton]}
             disabled={!postText.trim()}
             onPress={handleSubmit}
+            accessibilityLabel="Publicar post"
           >
             <Text style={styles.postButtonText}>
               Publicar
@@ -47,11 +71,16 @@ const CreatePostModal = ({ visible, onClose, onSubmit }) => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.modalContent}>
+        {/* Conteúdo */}
+        <ScrollView 
+          style={styles.modalContent}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.userArea}>
             <Image 
-              source={require('../../assets/images/abihobbs.jpeg')}
+              source={userImage}
               style={styles.userIcon}
+              accessibilityIgnoresInvertColors
             />
 
             <TextInput
@@ -60,32 +89,73 @@ const CreatePostModal = ({ visible, onClose, onSubmit }) => {
               placeholder="No que você está pensando?"
               placeholderTextColor="#777"
               value={postText}
-              onChangeText={setPostText}
+              onChangeText={handleTextChange}
               autoFocus
+              textAlignVertical="top"
+              maxLength={500}
+              accessibilityLabel="Campo de texto para publicação"
             />
           </View>
         </ScrollView>
 
         <View style={styles.mediaOptions}>
           <View style={styles.mediaButtons}>
-            <TouchableOpacity style={styles.mediaButton}>
-              <Icon name="image" type="material-community" color="#4B7CCC" size={24} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.mediaButton}>
-              <Icon name="file-gif-box" type="material-community" color="#4B7CCC" size={28} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.mediaButton}>
-              <Icon name="emoji-emotions" type="material" color="#4B7CCC" size={24} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.mediaButton}>
-              <Icon name="place" type="material" color="#4B7CCC" size={24} />
-            </TouchableOpacity>
+            {MEDIA_OPTIONS.map((option) => (
+              <MediaButton
+                key={option.iconName}
+                iconName={option.iconName}
+                iconType={option.iconType}
+                onPress={option.onPress}
+              />
+            ))}
           </View>
         </View>
       </View>
     </Modal>
   );
-};
+});
+
+const MediaButton = React.memo(({ iconName, iconType, onPress }: {
+  iconName: string;
+  iconType: string;
+  onPress: () => void;
+}) => (
+  <TouchableOpacity 
+    style={styles.mediaButton}
+    onPress={onPress}
+    accessibilityLabel={`Adicionar ${iconName}`}
+  >
+    <Icon 
+      name={iconName} 
+      type={iconType} 
+      color="#4B7CCC" 
+      size={24} 
+    />
+  </TouchableOpacity>
+));
+
+const MEDIA_OPTIONS = [
+  {
+    iconName: 'image',
+    iconType: 'material-community',
+    onPress: () => console.log('Adicionar imagem')
+  },
+  {
+    iconName: 'file-gif-box',
+    iconType: 'material-community',
+    onPress: () => console.log('Adicionar GIF')
+  },
+  {
+    iconName: 'emoji-emotions',
+    iconType: 'material',
+    onPress: () => console.log('Adicionar emoji')
+  },
+  {
+    iconName: 'place',
+    iconType: 'material',
+    onPress: () => console.log('Adicionar localização')
+  }
+];
 
 const styles = StyleSheet.create({
   modalContainer: {
@@ -97,6 +167,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
   },
   backButton: {
     padding: 5,
@@ -108,10 +180,12 @@ const styles = StyleSheet.create({
   },
   postButton: {
     backgroundColor: "#4B7CCC",
-    padding: 5,
-    paddingLeft: 15,
-    paddingRight: 15,
-    borderRadius: 15
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   postButtonText: {
     color: 'white',
@@ -124,7 +198,7 @@ const styles = StyleSheet.create({
   },
   userArea: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: 15,
   },
   userIcon: {
@@ -140,24 +214,18 @@ const styles = StyleSheet.create({
     padding: 0,
     marginBottom: 0,
     flex: 1,
+    lineHeight: 24,
   },
   mediaOptions: {
     padding: 15,
     borderTopWidth: 1,
     borderTopColor: '#333',
   },
-  mediaOptionsTitle: {
-    color: '#777',
-    marginBottom: 10,
-  },
   mediaButtons: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingHorizontal: 20
   },
   mediaButton: {
-    alignItems: 'center',
-    alignSelf: 'center',
     padding: 10,
   },
 });
