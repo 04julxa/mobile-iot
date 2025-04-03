@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-nativ
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Alert } from 'react-native';
 
 function RegisterPage() {
     const router = useRouter();
@@ -11,7 +12,7 @@ function RegisterPage() {
     const [password, setPassword] = useState({ value: '', dirty: false });
     const [confirmPassword, setConfirmPassword] = useState({ value: '', dirty: false });
     const [username, setUsername] = useState({ value: '', dirty: false });
-    const [phone, setPhone] = useState({ value: '', dirty: false });
+    const [nickname, setNickname] = useState({ value: '', dirty: false });
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\+?[1-9]\d{1,14}$/;
@@ -24,11 +25,9 @@ function RegisterPage() {
         }
         return null;
     };
-        const handleErrorPhone = () => {
-            if (!phone.value && phone.dirty) {
+        const handleNickname = () => {
+            if (!nickname.value && nickname.dirty) {
                 return <Text style={styles.errorText}>Campo obrigatório</Text>;
-            } else if (!phoneRegex.test(phone.value) && phone.dirty) {
-                return <Text style={styles.errorText}>Número de celular inválido</Text>;
             }
             return null;
         };
@@ -58,18 +57,44 @@ function RegisterPage() {
         return null;
     }
 
-    const handleRegister = () => {
-        if (!emailRegex.test(email.value) || !phoneRegex.test(phone.value) || !password.value || !username.value || password.value !== confirmPassword.value) {
-            setEmail({ ...email, dirty: true });
-            setPassword({ ...password, dirty: true });
-            setUsername({ ...username, dirty: true });
-            setConfirmPassword ({ ...confirmPassword, dirty: true });
-            setPhone({ ...phone, dirty: true });
-            return;
-        }
-        router.push('/login');
-    };
+const handleRegister = async () => {
+    if (!emailRegex.test(email.value) ||
+        !password.value || !username.value || 
+        password.value !== confirmPassword.value) {
+        return;
+    }
 
+    try {
+        const response = await fetch(`http://10.0.2.2:3001/api/user`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: nickname.value,
+                email: email.value,
+                password: password.value,
+                username: username.value,
+                avatar: "",
+                bio: "",
+                follower: 0, 
+                following: 0
+            }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Erro ao registrar');
+        }
+
+        Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
+        router.push('/login');
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Erro ao conectar com o servidor';
+        Alert.alert('Erro', errorMessage);
+    }
+};
     return (
         <LinearGradient
         colors={["#222325", '#222325']}
@@ -95,14 +120,14 @@ function RegisterPage() {
                 {handleErrorEmail()}
 
                 <TextInput
-                    onChangeText={(text) => setPhone({ value: text, dirty: true })}
-                    onBlur={() => setPhone({ ...phone, dirty: true })}
+                    onChangeText={(text) => setNickname({ value: text, dirty: true })}
+                    onBlur={() => setNickname({ ...nickname, dirty: true })}
                     style={styles.input}
-                    placeholder="Número de celular"
+                    placeholder="Nome"
                     placeholderTextColor="#4B7CCC"
                     keyboardType="phone-pad"
                 />
-                {handleErrorPhone()}
+                {handleNickname()}
 
                 <TextInput
                 onChangeText={(text) => setUsername({ value: text, dirty: true })}

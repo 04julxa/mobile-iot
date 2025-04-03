@@ -51,10 +51,8 @@ export default function RootLayout() {
         <Stack.Screen name="welcome" options={defaultHeaderOptions} />
         <Stack.Screen name="login" options={defaultHeaderOptions} />
         <Stack.Screen name="register" options={defaultHeaderOptions}/>
-        <Stack.Screen name="home" options={defaultHeaderOptions}/>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" options={defaultHeaderOptions} />
-        <Stack.Screen name="postDetail" options={defaultHeaderOptions} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
