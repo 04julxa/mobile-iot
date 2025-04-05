@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { 
-  View, 
-  Modal, 
-  Text, 
-  TouchableOpacity, 
+import {
+  View,
+  Modal,
+  Text,
+  TouchableOpacity,
   TextInput,
   Image,
   StyleSheet,
@@ -15,18 +15,19 @@ interface CreatePostModalProps {
   visible: boolean;
   onClose: () => void;
   onSubmit: (postText: string) => void;
-  userImage?: string;
-  post?: any; 
-  isBookmarked?: boolean; 
-  onBookmarkPress?: () => void; 
-
+  userImage?: string | null;
+  userInitial?: string; // inicial do nome
+  post?: any;
+  isBookmarked?: boolean;
+  onBookmarkPress?: () => void;
 }
 
-const CreatePostModal: React.FC<CreatePostModalProps> = React.memo(({ 
-  visible, 
-  onClose, 
+const CreatePostModal: React.FC<CreatePostModalProps> = React.memo(({
+  visible,
+  onClose,
   onSubmit,
-  userImage = require('../../assets/images/abihobbs.jpeg')
+  userImage,
+  userInitial = 'U'
 }) => {
   const [postText, setPostText] = useState('');
 
@@ -49,39 +50,44 @@ const CreatePostModal: React.FC<CreatePostModalProps> = React.memo(({
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalHeader}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.backButton}
             onPress={onClose}
             accessibilityLabel="Fechar modal"
           >
             <Icon name="arrow-back" type="material" color="#4B7CCC" size={24} />
           </TouchableOpacity>
-          
+
           <Text style={styles.modalTitle}>Criar publicação</Text>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[styles.postButton, !postText.trim() && styles.disabledButton]}
             disabled={!postText.trim()}
             onPress={handleSubmit}
             accessibilityLabel="Publicar post"
           >
-            <Text style={styles.postButtonText}>
-              Publicar
-            </Text>
+            <Text style={styles.postButtonText}>Publicar</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Conteúdo */}
-        <ScrollView 
+        <ScrollView
           style={styles.modalContent}
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.userArea}>
-            <Image 
-              source={userImage}
-              style={styles.userIcon}
-              accessibilityIgnoresInvertColors
-            />
+            {userImage ? (
+              <Image
+                source={typeof userImage === 'string' ? { uri: userImage } : userImage}
+                style={styles.userIcon}
+                accessibilityIgnoresInvertColors
+              />
+            ) : (
+              <View style={styles.placeholderIcon}>
+                <Text style={styles.placeholderInitial}>
+                  {userInitial?.charAt(0).toUpperCase() || 'U'}
+                </Text>
+              </View>
+            )}
 
             <TextInput
               style={styles.postInput}
@@ -120,16 +126,16 @@ const MediaButton = React.memo(({ iconName, iconType, onPress }: {
   iconType: string;
   onPress: () => void;
 }) => (
-  <TouchableOpacity 
+  <TouchableOpacity
     style={styles.mediaButton}
     onPress={onPress}
     accessibilityLabel={`Adicionar ${iconName}`}
   >
-    <Icon 
-      name={iconName} 
-      type={iconType} 
-      color="#4B7CCC" 
-      size={24} 
+    <Icon
+      name={iconName}
+      type={iconType}
+      color="#4B7CCC"
+      size={24}
     />
   </TouchableOpacity>
 ));
@@ -206,6 +212,20 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     marginRight: 10,
+  },
+  placeholderIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#4B7CCC',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  placeholderInitial: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   postInput: {
     color: 'white',

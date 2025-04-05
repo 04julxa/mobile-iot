@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ActivityInd
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { login, storeAuthData } from './services/authServices';
+import { login, storeAuthData } from '../components/src/services/authServices';
 
 interface FormField {
   value: string;
@@ -36,7 +36,6 @@ function LoginPage() {
     };
 
     const handleLogin = async () => {
-        // Validação antes da submissão
         setEmail(prev => ({ ...prev, dirty: true }));
         setPassword(prev => ({ ...prev, dirty: true }));
         
@@ -159,7 +158,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center'
     },
     loginButton: {
-        padding: 15,
+        padding: 10,
         borderRadius: 5,
         marginVertical: 10,
         width: '80%',
@@ -167,19 +166,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#4B7CCC',
         alignSelf: 'center',
-        minHeight: 50,
     },
     secondaryButton: {
-        padding: 15,
+        padding: 10,
         borderRadius: 5,
-        marginVertical: 10,
-        marginBottom: 30,
+        marginTop: 10,
+        marginBottom: 50,
         width: '80%',
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#4B7CCC',
         alignSelf: 'center',
-        minHeight: 50,
     },
     title: {
         fontSize: 24,
@@ -232,7 +229,7 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'black', 
         fontWeight: 'bold',
-        fontSize: 16,
+        fontSize: 14,
     },
 });
 

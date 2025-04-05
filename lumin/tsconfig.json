@@ -14,5 +14,5 @@
     ".expo/types/**/*.ts",
   "expo-env.d.ts",
   "components/src/Post.tsx"
-, "app/(tabs)/profile2.js", "components/src/CreatePostModal.js"]
+, "app/(tabs)/profile2.js", "components/src/CreatePostModal.js", "components/src/Profile.tsx"]
 }

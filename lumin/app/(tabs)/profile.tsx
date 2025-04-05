@@ -1,43 +1,35 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, ActivityIndicator, Text } from 'react-native';
 import Profile from '../../components/src/Profile';
+import { AuthProvider, useAuth } from '../../components/src/context/authContext';
+
+const AppContent = () => {
+  const { isLoading, user } = useAuth();
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
+
+  if (!user) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ color: 'white' }}>Usuário não autenticado.</Text>
+      </View>
+    );
+  }
+
+  return <Profile user={user} />; 
+};
 
 const App = () => {
-  const userData = {
-    nickname: 'eve',
-    username: 'evlia04',
-    icon: require('../../assets/images/bonecazoiuda.jpg'),
-    headerImage: require('../../assets/images/bonecazoiuda.jpg'),
-    bio: "Desenvolvedora Mobile | React Native",
-    posts: [ 
-      {
-      id: 1,
-      nickname: 'eve',
-      icon: require('../../assets/images/bonecazoiuda.jpg'),
-      email: 'evelynjulia945@gmail.com',
-      username: 'evlia04',
-      content: "saudade quando eu quebrava a aplicação dos outros ao invés de quebrar a minha",
-      image: require('../../assets/images/evepost.jpeg'),
-        comments: [
-          {
-            nickname: "amigo1",
-            username: "amigo_dev",
-            icon: null,
-            comment: "Parabéns pelo post! 👏",
-            likes: 5,
-            time: "2h",
-            replyTo: 'evlia04'
-          }
-        ]
-      },
-    ]
-
-  };
-
   return (
-    <View style={{ flex: 1 }}>
-      <Profile user={userData} />
-    </View>
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 };
 

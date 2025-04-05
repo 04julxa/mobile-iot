@@ -13,6 +13,8 @@ import { FAB } from 'react-native-elements';
 import { Post } from '../../components/src/Post';
 import CreatePostModal from '../../components/src/CreatePostModal';
 import { ViewPostModal } from '../../components/src/ViewPostModal';
+import { useAuth } from '../../components/src/context/authContext';
+import { Buffer } from 'buffer';
 
 interface Author {
   _id: string;
@@ -43,6 +45,8 @@ export default function Home() {
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [viewModalVisible, setViewModalVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const { user, accessToken } = useAuth();
+
 
   const API_BASE_URL = 'http://10.0.2.2:3001/api';
 
@@ -91,29 +95,23 @@ export default function Home() {
   }, [fetchPosts]);
 
   const handleNewPost = useCallback(async (postContent: string) => {
-    const newPost = {
-      content: postContent,
-      author: {
-        _id: "123456",
-        name: "Você",
-        username: "seu_usuario",
-        email: "user@example.com"
-      },
-      likes: [],
-      comments: []
-    };
-
-    try {
+   try {
+      const formData = new FormData();
+      formData.append('content', postContent);
+      formData.append('author', String(user?._id));
+      
       const response = await fetch(`${API_BASE_URL}/post`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newPost)
+        headers: {
+          'Authorization': `Bearer ${accessToken}`, 
+        },
+        body: formData
       });
-
+  
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Erro ao criar post: ${response.status}`);
       }
-
+  
       const result = await response.json();
       setPosts(prevPosts => [result.data, ...prevPosts]);
       setCreateModalVisible(false);
@@ -121,11 +119,11 @@ export default function Home() {
     } catch (error) {
       console.error('Erro ao criar post:', error);
       Alert.alert(
-        'Erro', 
+        'Erro',
         `Falha ao criar post: ${error instanceof Error ? error.message : 'Erro desconhecido'}`
       );
     }
-  }, []);
+  }, [accessToken]);
 
   const handleViewPost = useCallback((post: Post) => {
     setSelectedPost(post);
@@ -209,6 +207,8 @@ export default function Home() {
         visible={createModalVisible}
         onClose={() => setCreateModalVisible(false)}
         onSubmit={handleNewPost}
+        userImage={user?.avatar}
+        userInitial={user?.name?.charAt(0)}
       />
 
       <ViewPostModal

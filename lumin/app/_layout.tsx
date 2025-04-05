@@ -8,6 +8,8 @@ import { Image } from 'react-native';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { LinearGradient } from 'expo-linear-gradient';
+import { AuthProvider } from '../components/src/context/authContext';
+
 
 SplashScreen.preventAutoHideAsync();
 
@@ -46,6 +48,7 @@ export default function RootLayout() {
   }
 
   return (
+    <AuthProvider>
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="welcome" options={defaultHeaderOptions} />
@@ -56,6 +59,7 @@ export default function RootLayout() {
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
+    </AuthProvider>
   );
 }
 
