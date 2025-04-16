@@ -55,6 +55,8 @@ export default function RootLayout() {
         <Stack.Screen name="login" options={defaultHeaderOptions} />
         <Stack.Screen name="register" options={defaultHeaderOptions}/>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="chat" options={{ headerShown: false }} />
+        <Stack.Screen name="aichat" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" options={defaultHeaderOptions} />
       </Stack>
       <StatusBar style="auto" />

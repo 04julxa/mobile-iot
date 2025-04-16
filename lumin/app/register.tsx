@@ -83,7 +83,7 @@ function RegisterPage() {
         }
 
         try {
-            const response = await fetch(`http://192.168.18.41:3001/api/user`, {
+            const response = await fetch(`http://10.5.4.33:3001/api/user`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

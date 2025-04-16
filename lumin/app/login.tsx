@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ActivityInd
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { login, storeAuthData } from '../components/src/services/authServices';
+import { login } from '../components/src/services/authServices';
+import * as SecureStore from 'expo-secure-store';
 
 interface FormField {
   value: string;
@@ -52,14 +53,33 @@ function LoginPage() {
         setIsLoading(true);
 
         try {
+            // 1. Fazemos o login
             const data = await login(email.value, password.value);
-            await storeAuthData(data);
             
+            // 2. Armazenamos os dados de autenticação de forma segura
+            await SecureStore.setItemAsync('userToken', data.accessToken || data.accessToken);
+            await SecureStore.setItemAsync('userId', data.user._id || data.user._id);
+            
+            // 3. Mostramos feedback para o usuário
             Alert.alert('Sucesso', 'Login realizado com sucesso!');
-            router.replace('/home'); // Usar replace para evitar voltar para login
+            
+            // 4. Redirecionamos para a tela principal
+            router.replace('/home');
+            
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Erro ao fazer login';
+            // Tratamento de erros melhorado
+            let errorMessage = 'Erro ao fazer login';
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } else if (typeof error === 'string') {
+                errorMessage = error;
+            }
+            
             Alert.alert('Erro', errorMessage);
+            
+            // Limpa os campos em caso de erro
+            setEmail({ value: '', dirty: false });
+            setPassword({ value: '', dirty: false });
         } finally {
             setIsLoading(false);
         }
@@ -140,6 +160,7 @@ function LoginPage() {
         </LinearGradient>
     );
 }
+
 
 const styles = StyleSheet.create({
     container: {

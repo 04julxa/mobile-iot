@@ -3,12 +3,12 @@ import { useRouter } from 'expo-router'
 import React, { useState } from 'react'
 import { Text, TouchableOpacity } from 'react-native'
 import { Divider, Menu } from 'react-native-paper'
-import { useAuth } from '../components/src/context/authContext' 
+import { useAuth } from '../components/src/context/authContext'
 
 const MenuHeader = () => {
   const [visible, setVisible] = useState(false)
   const router = useRouter()
-  const { logout } = useAuth() 
+  const { logout } = useAuth()
 
   const handleLogout = async () => {
     try {
@@ -17,6 +17,7 @@ const MenuHeader = () => {
     } catch (error) {
       console.error('Erro ao fazer logout:', error)
     }
+    setVisible(false)
   }
 
   return (
@@ -31,7 +32,13 @@ const MenuHeader = () => {
     >
       <Menu.Item title={<Text>Perfil</Text>} />
       <Menu.Item title={<Text>Configurações</Text>} />
-      <Menu.Item title={<Text>Conversar com a IA</Text>} />
+      <Menu.Item
+        onPress={() => {
+          router.push('/IAChat')
+          setVisible(false)
+        }}
+        title={<Text>Conversar com a IA</Text>}
+      />
       <Divider />
       <Menu.Item onPress={handleLogout} title={<Text>Logout</Text>} />
     </Menu>

@@ -75,6 +75,34 @@ export default function TabLayout() {
             headerShown: false,
           }}
         />
+
+      <Tabs.Screen
+          name="conversations"
+          options={{
+            title: 'Conversas',
+            tabBarIcon: ({ focused }) => (
+              <MaterialCommunityIcons
+                size={28}
+                name="chat"
+                color={focused ? '#4B7CCC' : 'white'}
+              />
+            ),
+            headerRight: () => <MenuHeader />,
+            headerTitle: () => (
+              <Image
+                source={require('../../assets/images/lumin-blacklogo.png')}
+                style={{ width: 100, height: 40, resizeMode: 'contain' }}
+              />
+            ),
+            headerTitleAlign: 'center',
+            headerBackground: () => (
+              <LinearGradient colors={["#4B7CCC", "#4B7CCC", "#4B7CCC"]} style={{ flex: 1 }} />
+            ),
+            headerStyle: {
+              height: 70,
+            },
+          }}
+        />
       </Tabs>
     </PaperProvider>
   );

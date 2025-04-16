@@ -51,7 +51,7 @@ export default function Home() {
   const { user, accessToken } = useAuth();
 
 
-  const API_BASE_URL = 'http://192.168.18.41:3001/api';
+  const API_BASE_URL = 'http://10.5.4.33:3001/api';
 
   const fetchPosts = useCallback(async () => {
     try {
