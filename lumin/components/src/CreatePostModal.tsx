@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Modal,
@@ -10,13 +10,15 @@ import {
   ScrollView
 } from 'react-native';
 import { Icon } from 'react-native-elements';
+import { PermissionsAndroid, Platform } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+
 
 interface CreatePostModalProps {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (postText: string) => void;
+  onSubmit: (postText: string, selectedImage: any) => void;
   userImage?: string | null;
-  userInitial?: string; // inicial do nome
   post?: any;
   isBookmarked?: boolean;
   onBookmarkPress?: () => void;
@@ -27,19 +29,65 @@ const CreatePostModal: React.FC<CreatePostModalProps> = React.memo(({
   onClose,
   onSubmit,
   userImage,
-  userInitial = 'U'
 }) => {
   const [postText, setPostText] = useState('');
+  const [selectedImage, setSelectedImage] = useState<any>(null); 
 
   const handleSubmit = useCallback(() => {
-    onSubmit(postText);
+    onSubmit(postText, selectedImage);
     setPostText('');
+    setSelectedImage(null);
     onClose();
-  }, [postText, onSubmit, onClose]);
+  }, [postText, selectedImage, onSubmit, onClose]);
 
   const handleTextChange = useCallback((text: string) => {
     setPostText(text);
   }, []);
+  
+  const pickImageFromGallery = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  
+    if (status !== 'granted') {
+      alert('Permissão negada para acessar a galeria!');
+      return;
+    }
+  
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+  
+    if (!result.canceled && result.assets.length > 0) {
+      const selected = result.assets[0];
+      console.log('Imagem selecionada:', selected.uri);
+      setSelectedImage(selected);
+    }
+  };
+
+  const MEDIA_OPTIONS = useMemo(() => [
+    {
+      iconName: 'image',
+      iconType: 'material-community',
+      onPress: pickImageFromGallery
+    },
+    {
+      iconName: 'file-gif-box',
+      iconType: 'material-community',
+      onPress: () => console.log('Adicionar GIF')
+    },
+    {
+      iconName: 'emoji-emotions',
+      iconType: 'material',
+      onPress: () => console.log('Adicionar emoji')
+    },
+    {
+      iconName: 'place',
+      iconType: 'material',
+      onPress: () => console.log('Adicionar localização')
+    }
+  ], []);
 
   return (
     <Modal
@@ -50,43 +98,28 @@ const CreatePostModal: React.FC<CreatePostModalProps> = React.memo(({
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalHeader}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={onClose}
-            accessibilityLabel="Fechar modal"
-          >
+          <TouchableOpacity style={styles.backButton} onPress={onClose}>
             <Icon name="arrow-back" type="material" color="#4B7CCC" size={24} />
           </TouchableOpacity>
-
           <Text style={styles.modalTitle}>Criar publicação</Text>
-
           <TouchableOpacity
-            style={[styles.postButton, !postText.trim() && styles.disabledButton]}
-            disabled={!postText.trim()}
+            style={[styles.postButton, !postText.trim() && !selectedImage && styles.disabledButton]}
+            disabled={!postText.trim() && !selectedImage}
             onPress={handleSubmit}
-            accessibilityLabel="Publicar post"
           >
             <Text style={styles.postButtonText}>Publicar</Text>
           </TouchableOpacity>
         </View>
 
-        <ScrollView
-          style={styles.modalContent}
-          keyboardShouldPersistTaps="handled"
-        >
+        <ScrollView style={styles.modalContent} keyboardShouldPersistTaps="handled">
           <View style={styles.userArea}>
             {userImage ? (
               <Image
                 source={typeof userImage === 'string' ? { uri: userImage } : userImage}
                 style={styles.userIcon}
-                accessibilityIgnoresInvertColors
               />
             ) : (
-              <View style={styles.placeholderIcon}>
-                <Text style={styles.placeholderInitial}>
-                  {userInitial?.charAt(0).toUpperCase() || 'U'}
-                </Text>
-              </View>
+              <View style={styles.placeholderIcon} />
             )}
 
             <TextInput
@@ -99,9 +132,21 @@ const CreatePostModal: React.FC<CreatePostModalProps> = React.memo(({
               autoFocus
               textAlignVertical="top"
               maxLength={500}
-              accessibilityLabel="Campo de texto para publicação"
             />
           </View>
+
+          {selectedImage && (
+            <Image
+              source={{ uri: selectedImage.uri }}
+              style={{
+                width: '100%',
+                height: 200,
+                borderRadius: 10,
+                marginTop: 10
+              }}
+              resizeMode="cover"
+            />
+          )}
         </ScrollView>
 
         <View style={styles.mediaOptions}>
@@ -126,42 +171,10 @@ const MediaButton = React.memo(({ iconName, iconType, onPress }: {
   iconType: string;
   onPress: () => void;
 }) => (
-  <TouchableOpacity
-    style={styles.mediaButton}
-    onPress={onPress}
-    accessibilityLabel={`Adicionar ${iconName}`}
-  >
-    <Icon
-      name={iconName}
-      type={iconType}
-      color="#4B7CCC"
-      size={24}
-    />
+  <TouchableOpacity style={styles.mediaButton} onPress={onPress}>
+    <Icon name={iconName} type={iconType} color="#4B7CCC" size={24} />
   </TouchableOpacity>
 ));
-
-const MEDIA_OPTIONS = [
-  {
-    iconName: 'image',
-    iconType: 'material-community',
-    onPress: () => console.log('Adicionar imagem')
-  },
-  {
-    iconName: 'file-gif-box',
-    iconType: 'material-community',
-    onPress: () => console.log('Adicionar GIF')
-  },
-  {
-    iconName: 'emoji-emotions',
-    iconType: 'material',
-    onPress: () => console.log('Adicionar emoji')
-  },
-  {
-    iconName: 'place',
-    iconType: 'material',
-    onPress: () => console.log('Adicionar localização')
-  }
-];
 
 const styles = StyleSheet.create({
   modalContainer: {
@@ -175,6 +188,15 @@ const styles = StyleSheet.create({
     padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
+  },
+  placeholderIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#4B7CCC',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
   },
   backButton: {
     padding: 5,
@@ -213,26 +235,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 10,
   },
-  placeholderIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#4B7CCC',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
-  placeholderInitial: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
   postInput: {
     color: 'white',
     fontSize: 18,
     maxHeight: 200,
     padding: 0,
     marginBottom: 0,
+    marginTop: 6,
     flex: 1,
     lineHeight: 24,
   },
@@ -249,5 +258,6 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 });
+
 
 export default CreatePostModal;

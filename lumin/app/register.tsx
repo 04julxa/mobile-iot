@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView} from 'react-native';
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Alert } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform  } from 'react-native';
+import baseURL from '../components/src/services/api'
 
 function RegisterPage() {
     const router = useRouter();
@@ -13,9 +14,10 @@ function RegisterPage() {
     const [confirmPassword, setConfirmPassword] = useState({ value: '', dirty: false });
     const [username, setUsername] = useState({ value: '', dirty: false });
     const [nickname, setNickname] = useState({ value: '', dirty: false });
-
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
 
     const handleErrorEmail = () => {
         if (!email.value && email.dirty) {
@@ -25,12 +27,13 @@ function RegisterPage() {
         }
         return null;
     };
-        const handleNickname = () => {
-            if (!nickname.value && nickname.dirty) {
-                return <Text style={styles.errorText}>Campo obrigatório</Text>;
-            }
-            return null;
-        };
+    
+    const handleNickname = () => {
+        if (!nickname.value && nickname.dirty) {
+            return <Text style={styles.errorText}>Campo obrigatório</Text>;
+        }
+        return null;
+    };
 
     const handleErrorPassword = () => {
         if (!password.value && password.dirty) {
@@ -50,51 +53,68 @@ function RegisterPage() {
         return null;
     };
 
-    const validateUsername = () => {
+    const validateUsername = () => {    
         if (!username.value && username.dirty) {
             return <Text style={styles.errorText}>Campo obrigatório</Text>;
         }
+    
+        if (username.value && !usernameRegex.test(username.value) && username.dirty) {
+            return <Text style={styles.errorText}>Apenas letras, números e "_" são permitidos</Text>;
+        }
+    
         return null;
-    }
+    };
 
-const handleRegister = async () => {
-    if (!emailRegex.test(email.value) ||
-        !password.value || !username.value || 
-        password.value !== confirmPassword.value) {
-        return;
-    }
+    const isFormValid = () => {
+        return (
+            emailRegex.test(email.value) &&
+            usernameRegex.test(username.value) &&
+            password.value.length >= 6 &&
+            confirmPassword.value === password.value &&
+            nickname.value
+        );
+    };
 
-    try {
-        const response = await fetch(`http://10.0.2.2:3001/api/user`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                name: nickname.value,
-                email: email.value,
-                password: password.value,
-                username: username.value,
-                avatar: "",
-                bio: "",
-                follower: 0, 
-                following: 0
-            }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || 'Erro ao registrar');
+    const handleRegister = async () => {
+        if (!emailRegex.test(email.value) ||
+            !password.value || !username.value || 
+            password.value !== confirmPassword.value) {
+            return;
         }
 
-        Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
-        router.push('/login');
-    } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Erro ao conectar com o servidor';
-        Alert.alert('Erro', errorMessage);
-    }
-};
+        try {
+            const response = await fetch(`http://192.168.18.41:3001/api/user`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: nickname.value,
+                    email: email.value,
+                    password: password.value,
+                    username: username.value,
+                    avatar: "",
+                    bio: "",
+                    follower: 0, 
+                    following: 0
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!isFormValid()) {
+                Alert.alert("Erro", "Por favor, preencha todos os campos corretamente.");
+                return;
+            }
+
+            Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
+            router.push('/login');
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Erro ao conectar com o servidor';
+            Alert.alert('Erro', errorMessage);
+        }
+    };
+
     return (
         <LinearGradient
         colors={["#222325", '#222325']}
@@ -102,6 +122,13 @@ const handleRegister = async () => {
             end={{ x: 1, y: 1 }}
             style={{ flex: 1 }}
         >
+            
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+        >
+        <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
             <View style={styles.formContainer}>
                 <View style={styles.logoContainer}>
                     <MaterialCommunityIcons style={styles.logo} name="account-circle" size={34} color="#4B7CCC" />
@@ -125,7 +152,6 @@ const handleRegister = async () => {
                     style={styles.input}
                     placeholder="Nome"
                     placeholderTextColor="#4B7CCC"
-                    keyboardType="phone-pad"
                 />
                 {handleNickname()}
 
@@ -168,6 +194,9 @@ const handleRegister = async () => {
                 </View>
                 {handleErrorConfirmPassword()}
             </View>
+            </ScrollView>
+
+            <View style={{marginTop: 0}}>
 
             <TouchableOpacity style={styles.loginButton} onPress={handleRegister}>
                 <Text style={{ color: 'black', fontWeight: 'bold' }}>Se cadastrar</Text>
@@ -176,6 +205,8 @@ const handleRegister = async () => {
             <TouchableOpacity style={styles.registerButton} onPress={() => router.push('/welcome')}>
                 <Text style={{ color: 'black', fontWeight: 'bold' }}>Voltar</Text>
             </TouchableOpacity>
+            </View>
+            </KeyboardAvoidingView>
         </LinearGradient>
     );
 }
@@ -195,7 +226,8 @@ const styles = StyleSheet.create({
         padding: 20,
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginTop: 50
     },
     loginButton: {
         padding: 10,
@@ -266,7 +298,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 2,
         marginTop: 10,
         marginBottom: 10,
-        color: '#02DBFF'
+        color: '#4B7CCC'
     },
     errorText: {
         color: 'red',

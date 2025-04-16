@@ -15,6 +15,8 @@ import CreatePostModal from '../../components/src/CreatePostModal';
 import { ViewPostModal } from '../../components/src/ViewPostModal';
 import { useAuth } from '../../components/src/context/authContext';
 import { Buffer } from 'buffer';
+import * as FileSystem from 'expo-file-system';
+
 
 interface Author {
   _id: string;
@@ -45,10 +47,11 @@ export default function Home() {
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [viewModalVisible, setViewModalVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [selectedImage, setSelectedImage] = useState<{ uri: string; type?: string } | null>(null);
   const { user, accessToken } = useAuth();
 
 
-  const API_BASE_URL = 'http://10.0.2.2:3001/api';
+  const API_BASE_URL = 'http://192.168.18.41:3001/api';
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -61,19 +64,33 @@ export default function Home() {
       
       const result = await response.json();
       
-      const simplifiedPosts = result.data.map((post: Post) => ({
-        _id: post._id,
-        content: post.content,
-        author: post.author || {
-          _id: '',
-          name: 'Anônimo',
-          username: '',
-          email: ''
-        },
-        likes: Array.isArray(post.likes) ? post.likes : [],
-        comments: Array.isArray(post.comments) ? post.comments : [],
-        createdAt: post.createdAt || ''
-      }));
+      const simplifiedPosts = result.data.map((post: Post) => {
+        let imageUri = null;
+
+        if (post.image && post.image.data && post.image.contentType) {
+          try {
+            const base64String = Buffer.from(post.image.data).toString('base64');
+            imageUri = `data:${post.image.contentType};base64,${base64String}`;
+          } catch (error) {
+            console.error('Erro ao converter imagem de post:', error);
+          }
+        }
+
+        return {
+          _id: post._id,
+          content: post.content,
+          author: post.author || {
+            _id: '',
+            name: 'Anônimo',
+            username: '',
+            email: ''
+          },
+          image: imageUri, 
+          likes: Array.isArray(post.likes) ? post.likes : [],
+          comments: Array.isArray(post.comments) ? post.comments : [],
+          createdAt: post.createdAt || ''
+        };
+      });
       
       setPosts(simplifiedPosts);
     } catch (error) {
@@ -94,18 +111,37 @@ export default function Home() {
     fetchPosts();
   }, [fetchPosts]);
 
-  const handleNewPost = useCallback(async (postContent: string) => {
-   try {
+  const handleNewPost = useCallback(async (postContent: string, selectedImage: any) => {
+    try {
       const formData = new FormData();
       formData.append('content', postContent);
       formData.append('author', String(user?._id));
-      
+  
+      if (selectedImage) {
+        const fileUri = selectedImage.uri;
+  
+        const base64 = await FileSystem.readAsStringAsync(fileUri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+  
+        const imageName = selectedImage.uri.split('/').pop() || 'image.jpg';
+        const mimeType = selectedImage.type || 'image/jpeg';
+  
+        const file = {
+          uri: fileUri,
+          name: imageName,
+          type: mimeType,
+        };
+  
+        formData.append('image', file as any);
+      }
+  
       const response = await fetch(`${API_BASE_URL}/post`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${accessToken}`, 
+          'Authorization': `Bearer ${accessToken}`,
         },
-        body: formData
+        body: formData,
       });
   
       if (!response.ok) {
@@ -123,8 +159,8 @@ export default function Home() {
         `Falha ao criar post: ${error instanceof Error ? error.message : 'Erro desconhecido'}`
       );
     }
-  }, [accessToken]);
-
+  }, [accessToken, user?._id]);
+  
   const handleViewPost = useCallback((post: Post) => {
     setSelectedPost(post);
     setViewModalVisible(true);
@@ -207,8 +243,7 @@ export default function Home() {
         visible={createModalVisible}
         onClose={() => setCreateModalVisible(false)}
         onSubmit={handleNewPost}
-        userImage={user?.avatar}
-        userInitial={user?.name?.charAt(0)}
+        userImage={user?.avatar?.contentType}
       />
 
       <ViewPostModal

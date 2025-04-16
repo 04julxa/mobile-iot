@@ -1,4 +1,7 @@
 import React, { Component } from "react";
+import { Buffer } from 'buffer';
+global.Buffer = Buffer;
+
 import {
   Animated,
   View,
@@ -7,10 +10,13 @@ import {
   Image,
   SafeAreaView,
   StyleSheet,
+  TouchableOpacity,
+  Modal
 } from "react-native";
 import { Divider } from "react-native-paper";
 import { BlurView } from "expo-blur";
 import api from "./services/api";
+import EditProfile from './EditProfile';
 
 const HEADER_MAX_HEIGHT = 120;
 const HEADER_MIN_HEIGHT = 70;
@@ -27,6 +33,7 @@ class Profile extends Component {
       user: null,
       loading: true,
       error: null,
+      modalVisible: false
     };
   }
 
@@ -50,16 +57,23 @@ class Profile extends Component {
   fetchUserData = async () => {
     try {
       this.setState({ loading: true, error: null });
-
+  
       const userId = this.props.user?._id;
       if (!userId) throw new Error("Usuário não autenticado");
-
+  
       const response = await api.get(`/user/${userId}`);
       console.log("🔍 Dados do usuário retornados:", response.data);
-      
+  
       const userData = response.data?.data;
       if (!userData) throw new Error("Dados do usuário não encontrados");
-      
+  
+      if (userData.avatar?.data) {
+        userData.avatar.base64 = Buffer.from(userData.avatar.data).toString('base64');
+      }
+      if (userData.header?.data) {
+        userData.header.base64 = Buffer.from(userData.header.data).toString('base64');
+      }
+  
       this.setState({ user: userData, loading: false });
     } catch (error) {
       console.error("Erro ao buscar dados:", error);
@@ -71,7 +85,7 @@ class Profile extends Component {
   };
 
   render() {
-    const { user, shouldCover, loading } = this.state;
+    const { user, shouldCover, loading, modalVisible } = this.state;
 
     const headerHeight = this.state.scrollY.interpolate({
       inputRange: [0, HEADER_SCROLL_DISTANCE],
@@ -99,7 +113,7 @@ class Profile extends Component {
       ],
       outputRange: [
         HEADER_MAX_HEIGHT - (PROFILE_IMAGE_MAX_HEIGHT / 2),
-        HEADER_MAX_HEIGHT - ((PROFILE_IMAGE_MIN_HEIGHT / 100) / 100), // ele vai até o seu menor tamanho sem mexer de posição
+        HEADER_MAX_HEIGHT - ((PROFILE_IMAGE_MIN_HEIGHT / 100) / 100),
         HEADER_MIN_HEIGHT + 5,
       ],
       extrapolate: "clamp",
@@ -122,7 +136,9 @@ class Profile extends Component {
               height: headerHeight,
               zIndex: shouldCover ? 10 : 0,
               elevation: shouldCover ? 10 : 0,
-              backgroundColor: user?.avatar ? "transparent" : "#007AFF",
+              backgroundColor: user?.avatar? "transparent" : "#007AFF",
+              backgroundColor: user?.headerImage? "transparent" : "#007AFF",
+
             },
           ]}
         >
@@ -130,6 +146,30 @@ class Profile extends Component {
             <BlurView intensity={100} style={StyleSheet.absoluteFill} tint="dark" />
           </Animated.View>
         </Animated.View>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => this.setState({ modalVisible: false })}
+        >
+          <View style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.5)' 
+          }}>
+            <View style={{
+              flex: 1,
+              backgroundColor: 'white',
+              borderRadius: 0, 
+              padding: 0, 
+              width: '100%',
+              height: '100%' 
+            }}>
+
+              <EditProfile onClose={() => this.setState({ modalVisible: false })} user={user} />
+            </View>
+          </View>
+        </Modal>
 
         <ScrollView
           style={styles.scrollView}
@@ -150,26 +190,35 @@ class Profile extends Component {
               },
             ]}
           >
-            {user?.avatar ? (
+            {user?.avatar?.data ? (
               <Image
-                source={{ uri: user.avatar }}
+                source={{
+                   uri: `data:${user.avatar.contentType};base64,${Buffer.from(user.avatar.data).toString('base64')}`,
+                }}
                 style={styles.profileImage}
                 resizeMode="cover"
               />
-            ) : (
-              <View style={styles.defaultIcon}>
-                {user?.name && (
-                  <Text style={styles.initials}>
-                    {user.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase()}
-                  </Text>
-                )}
-              </View>
-            )}
+            ) : null}
           </Animated.View>
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: 'transparent',
+              padding: 5,
+              paddingInline: 15,
+              borderRadius: 20,
+              borderWidth: 0.5,
+              borderColor: 'grey',
+              alignItems: 'center',
+              alignSelf: 'flex-end',
+              marginTop: -20,
+              marginRight: 10,
+              marginBottom: -10
+            }}
+            onPress={() => this.setState({ modalVisible: true })}
+          >
+            <Text style={{ color: 'white', fontWeight: 'bold' }}>Editar Perfil</Text>
+          </TouchableOpacity>
 
           <View style={styles.userInfo}>
             {user?.name && <Text style={styles.nickname}>{user.name}</Text>}
@@ -178,18 +227,21 @@ class Profile extends Component {
 
             <View style={styles.statsContainer}>
               <View style={styles.statItem}>
-                <Text style={styles.statNumber}>0</Text>
+                <Text style={styles.statNumber}>
+                  {user?.following?.length || 0}
+                </Text>
                 <Text style={styles.statLabel}>Seguindo</Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statNumber}>0</Text>
+                <Text style={styles.statNumber}>
+                  {user?.followers?.length || 0}
+                </Text>
                 <Text style={styles.statLabel}>Seguidores</Text>
               </View>
             </View>
           </View>
 
           <Divider style={styles.divider} />
-
           <View style={{ height: 800 }} />
         </ScrollView>
       </SafeAreaView>

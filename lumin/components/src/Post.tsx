@@ -12,6 +12,7 @@ interface PostProps {
   icon?: any;
   image?: any;
   comments?: Array<any>;
+  createdAt?: string;
   likesCount?: number;
   repostsCount?: number;
   onPress?: () => void;
@@ -59,7 +60,7 @@ export const Post = React.memo(({
 
         {image && (
           <Card.Cover 
-            source={image} 
+            source={{uri: image}} 
             style={styles.image} 
           />
         )}

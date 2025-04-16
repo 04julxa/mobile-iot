@@ -1,16 +1,33 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Buffer } from 'buffer';
 
-const API_URL = 'http://10.0.2.2:3001/api';
-
+const API_URL = 'http://192.168.18.41:3001/api';
 export interface User {
   _id: string;
   name: string;
   email: string;
   username: string;
-  avatar?: string;
+  avatar?: {
+    data: {
+      type: string;
+      data: number[];
+    };
+    contentType: string;
+  };
+  headerImage?: {
+    data: {
+      type: string;
+      data: number[];
+    };
+    contentType: string;
+  } | null; 
   bio?: string;
   createdAt?: string;
-  updatedAt?: string;}
+  updatedAt?: string;
+  follower?: string[];
+  following?: string[];
+  location?: string;
+}
 
 export interface AuthResponse {
   success: boolean;
@@ -134,4 +151,3 @@ const authService = {
 };
 
 export default authService;
-

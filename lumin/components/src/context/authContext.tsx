@@ -1,13 +1,28 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import authService, { User, AuthResponse, storeAuthData} from '../services/authServices';
+import authService, { User, AuthResponse, storeAuthData } from '../services/authServices';
+
+interface UserProfileData {
+  avatar?: {
+    data: {
+      type: string;
+      data: number[];
+    };
+    contentType: string;
+  };
+  headerImage?: {
+    data: {
+      type: string;
+      data: number[];
+    };
+    contentType: string;
+  };
+  bio?: string;
+  [key: string]: any;
+}
 
 interface UserProfileResponse {
   success: boolean;
-  data?: {
-    avatar?: string;
-    bio?: string;
-    [key: string]: any;
-  };
+  data?: UserProfileData;
 }
 
 interface AuthContextData {
@@ -32,20 +47,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
- const loadAuthData = async () => {
-  try {
-    const { accessToken, refreshToken, user } = await authService.getAuthData();
+  const loadAuthData = async () => {
+    try {
+      const { accessToken, user } = await authService.getAuthData();
 
-    if (accessToken && user) {
-      setUser(user);
-      setAccessToken(accessToken);
+      if (accessToken && user) {
+        setUser(user);
+        setAccessToken(accessToken);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar as informações:', error);
+      await handleLogout();
     }
-  } catch (error) {
-    console.error('Erro ao carregar as informações:', error);
-    await handleLogout();
-  }
-};
-
+  };
 
   const handleLogin = async (authData: AuthResponse) => {
     await storeAuthData(authData);
@@ -60,26 +74,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const fetchUserProfile = async () => {
-    if (!user?._id) return;
+    if (!user?._id || !accessToken) return;
     
     try {
       setIsLoading(true);
-      const response = await fetch(`${authService.API_URL}/user/${user._id}`);
+      const response = await fetch(`${authService.API_URL}/user/${user._id}`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Erro HTTP: ${response.status}`);
+      }
+  
       const data: UserProfileResponse = await response.json();
   
-      if (data.success && data.data) {
-        setUser(prev => {
-          if (!prev) return null;
-          return {
-            ...prev,
-            ...data.data,
-            avatar: data.data?.avatar || prev.avatar || '',
-            bio: data.data?.bio || prev.bio || ''
-          };
-        });
+      if (!data?.success || !data?.data) {
+        throw new Error('Dados do perfil inválidos');
       }
+  
+      setUser(prev => {
+        if (!prev) return null;
+  
+        const updatedUser: User = {
+          ...prev,
+          name: data.data?.name ?? prev.name,
+          email: data.data?.email ?? prev.email,
+          username: data.data?.username ?? prev.username,
+          avatar: data.data?.avatar ?? prev.avatar,
+          headerImage: data.data?.headerImage ?? prev.headerImage,
+          bio: data.data?.bio ?? prev.bio,
+          // Mantém outros campos existentes
+          ...(prev as any)
+        };
+        
+        return updatedUser;
+      });
     } catch (error) {
       console.error('Erro ao buscar o perfil:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -104,14 +138,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       await handleLogout();
     } catch (error) {
-      console.error('Erro no login:', error);
+      console.error('Erro no logout:', error);
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const refreshToken = async () => {
+  const refreshToken = async (): Promise<void> => {
     try {
       setIsLoading(true);
       const newAccessToken = await authService.refreshToken();
@@ -126,7 +160,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    loadAuthData().finally(() => setIsLoading(false));
+    const initializeAuth = async () => {
+      await loadAuthData();
+      setIsLoading(false);
+    };
+
+    initializeAuth();
   }, []);
 
   return (

@@ -7,6 +7,7 @@ import {
     Text, 
     TouchableOpacity,
     Dimensions,
+    Image,
     ViewStyle,
     TextStyle,
     ImageStyle
@@ -16,6 +17,17 @@ import { Icon } from 'react-native-elements';
 import CreateCommentModal from './CreateCommentModal'
 import { PostActions } from './PostActions';
 import { Post } from './Post';
+
+const formatPostDate = (dateString?: string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = date.toLocaleString('pt-BR', { month: 'short' }); 
+  const year = date.getFullYear().toString().slice(2); 
+  return `${hours}:${minutes} • ${day} ${month} ${year}`;
+};
 
 interface ViewPostModalProps {
   visible: boolean;
@@ -37,196 +49,215 @@ export const ViewPostModal = ({
   toggleFollow
 }: ViewPostModalProps) => {
   const [isCommentModalVisible, setIsCommentModalVisible] = useState(false);
+  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   if (!post) return null;
   
   return (
     <Portal>
-      <Modal 
-        visible={visible} 
-        onDismiss={onClose}
-      >
+      <Modal visible={visible} onDismiss={onClose}>
         <View style={styles.modalContainer}>
-        <View style={styles.fullScreenContainer}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity 
-              style={styles.backButton}
-              onPress={onClose}
-            >
-              <Icon name="arrow-back" type="material" color="#4B7CCC" size={24} />
-            </TouchableOpacity>
-            <Text style={styles.modalHeaderTitle}>Post</Text>
-          </View>
-          
-          <ScrollView 
-            style={styles.modalScrollView}
-            showsVerticalScrollIndicator={false}
-          >
-            <Card style={styles.modalCard}> 
-              <Card.Title
-                title={
-                  <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <Avatar.Image 
-                        source={post.icon} 
-                        size={40} 
-                        style={{ backgroundColor: 'white', marginTop: 5, marginLeft: -5 }} 
-                      />
-                      <View style={{ marginLeft: 8.5, marginTop: 3 }}>
-                        <Text style={{ fontWeight: 'bold', color: 'white' }}>{post.author.name}</Text>
-                        <Text style={{ color: 'gray', marginTop: -3 }}>@{post.author.username}</Text>
-                      </View>
-                    </View>
-
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: -15}}>
-                      <TouchableOpacity 
-                        style={[styles.followButton, isFollowing && styles.followingButton]}
-                        onPress={toggleFollow}
-                      >
-                        <Text style={[styles.followButtonText, isFollowing && styles.followingButtonText]}>
-                          {isFollowing ? "Seguindo" : "Seguir"}
-                        </Text>
-                      </TouchableOpacity>
-
-                      <IconButton 
-                        icon="dots-vertical" 
-                        size={18} 
-                        onPress={() => { }} 
-                        iconColor="gray"
-                        style={{ marginLeft: 5 }} 
-                      />
-                    </View>
-                  </View>
-                }
-              />
-              
-              <Card.Content style={{ marginLeft: 0, paddingVertical: 4, marginTop: 5 }}>
-                <View style={{ marginBottom: 10 }}>
-                  {post.content && (
-                    <Text style={{ color: 'white', fontSize: 16 }}>
-                      {post.content}
-                    </Text>
-                  )}
-
-                  {post.image && (
-                    <Card.Cover
-                      source={post.image}
-                      style={{
-                        width: '100%',
-                        alignSelf: "center",
-                        marginTop: 15,
-                        borderRadius: 10,
-                      }}
-                      resizeMode="cover"
-                    />
-                  )}
-
-                  <View style={styles.statsContainer}>
-                    <View style={styles.statItem}>
-                      <Text style={styles.statLabel}>19:38 • 29 mar. 25 •</Text>
-                      <Text style={styles.statNumber}> 100</Text>
-                      <Text style={styles.statLabel}>Visualizações</Text>
-                    </View>
-                  </View>
-
-                  <Divider style={{ marginVertical: 10, backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
-
-                  <View style={styles.statsContainer}>
-                    <View style={styles.statItem}>
-                      <Text style={styles.statNumber}>{post.reposts || 0}</Text>
-                      <Text style={styles.statLabel}>Republicações</Text>
-                    </View>
-                    <View style={styles.statItem}>
-                      <Text style={styles.statNumber}>{post.comments?.length || 0}</Text>
-                      <Text style={styles.statLabel}>Comentarios</Text>
-                    </View>
-                    <View style={styles.statItem}>
-                      <Text style={styles.statNumber}>{post.likesCount || 0}</Text>
-                      <Text style={styles.statLabel}>Curtidas</Text>
-                    </View>
-                    <View style={styles.statItem}>
-                      <Text style={styles.statNumber}>{post.saves || 0}</Text>
-                      <Text style={styles.statLabel}>Itens Salvos</Text>
-                    </View>
-                  </View>
-
-                  <Divider style={{ marginVertical: 10, backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
-                </View>
-              </Card.Content>
-              
-              <PostActions
-                    commentsCount={post.comments.length}
-                    initialReposts={0} 
-                    initialLikes={post.likes.length}
-                    onBookmarkPress={onBookmarkPress}
-                    isBookmarked={isBookmarked}
-                    
-
-                  />
-              
-              <Divider style={{ marginVertical: 10, backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
-              
-              <View style={styles.commentsContainer}>
-                {post.comments?.map((comment: any, index: number) => (
-                  <React.Fragment key={index}>
-                    <View style={styles.commentItem}>
-                      <Avatar.Image 
-                        source={comment.icon} 
-                        size={40} 
-                        style={styles.commentAvatar}
-                      />
-                      
-                      <View style={styles.commentContent}>
-                        <View style={styles.commentHeader}>
-                          <Text style={styles.commentAuthor}>{comment.nickname}</Text>
-                          <Text style={styles.commentUsername}>@{comment.username}</Text>
-                          <Text style={styles.commentTime}>• {comment.time}</Text>
+          <View style={styles.fullScreenContainer}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity style={styles.backButton} onPress={onClose}>
+                <Icon name="arrow-back" type="material" color="#4B7CCC" size={24} />
+              </TouchableOpacity>
+              <Text style={styles.modalHeaderTitle}>Post</Text>
+            </View>
+            
+            <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
+              <Card style={styles.modalCard}> 
+                <Card.Title
+                  title={
+                    <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Avatar.Image 
+                          source={post.icon} 
+                          size={40} 
+                          style={{ backgroundColor: 'white', marginTop: 5, marginLeft: -5 }} 
+                        />
+                        <View style={{ marginLeft: 8.5, marginTop: 3 }}>
+                          <Text style={{ fontWeight: 'bold', color: 'white' }}>{post.author.name}</Text>
+                          <Text style={{ color: 'gray', marginTop: -3 }}>@{post.author.username}</Text>
                         </View>
-                        
-                        {comment.replyTo && (
-                          <Text style={styles.replyText}>
-                            Em resposta a <Text style={styles.replyUsername}>@{comment.replyTo}</Text>
+                      </View>
+
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: -15}}>
+                        <TouchableOpacity 
+                          style={[styles.followButton, isFollowing && styles.followingButton]}
+                          onPress={toggleFollow}
+                        >
+                          <Text style={[styles.followButtonText, isFollowing && styles.followingButtonText]}>
+                            {isFollowing ? "Seguindo" : "Seguir"}
                           </Text>
-                        )}
-                        
-                        <Text style={styles.commentText}>{comment.comment}</Text>
-                        
-                        <TouchableOpacity style={styles.commentLike}>
-                          <Icon 
-                            name="heart-outline" 
-                            type="material-community" 
-                            size={14} 
-                            color="gray" 
-                          />
-                          <Text style={styles.commentLikeCount}>{comment.likes}</Text>
                         </TouchableOpacity>
+
+                        <IconButton 
+                          icon="dots-vertical" 
+                          size={18} 
+                          onPress={() => { }} 
+                          iconColor="gray"
+                          style={{ marginLeft: 5 }} 
+                        />
                       </View>
                     </View>
-                    
-                    {index < post.comments.length - 1 && (
-                      <Divider style={{marginBottom: 10, backgroundColor: 'rgba(255, 255, 255, 0.2)'}} />
+                  }
+                />
+                
+                <Card.Content style={{ marginLeft: 0, paddingVertical: 4, marginTop: 5 }}>
+                  <View style={{ marginBottom: 10 }}>
+                    {post.content && (
+                      <Text style={{ color: 'white', fontSize: 16 }}>
+                        {post.content}
+                      </Text>
                     )}
-                  </React.Fragment>
-                ))}    
-              </View>
-            </Card>
-          </ScrollView>
+
+                    {post.image && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setSelectedImage(post.image);
+                          setIsImageModalVisible(true);
+                        }}
+                      >
+                        <Card.Cover
+                          source={{ uri: post.image }}
+                          style={{
+                            width: '100%',
+                            alignSelf: "center",
+                            marginTop: 15,
+                            borderRadius: 10,
+                          }}
+                          resizeMode="cover"
+                        />
+                      </TouchableOpacity>
+                    )}
+
+                    <View style={styles.statsContainer}>
+                      <View style={styles.statItem}>
+                        <Text style={styles.statLabel}>{formatPostDate(post.createdAt)} •</Text>
+                        <Text style={styles.statNumber}> 100</Text>
+                        <Text style={styles.statLabel}>Visualizações</Text>
+                      </View>
+                    </View>
+
+                    <Divider style={{ marginVertical: 10, backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
+
+                    <View style={styles.statsContainer}>
+                      <View style={styles.statItem}>
+                        <Text style={styles.statNumber}>{post.reposts || 0}</Text>
+                        <Text style={styles.statLabel}>Republicações</Text>
+                      </View>
+                      <View style={styles.statItem}>
+                        <Text style={styles.statNumber}>{post.comments?.length || 0}</Text>
+                        <Text style={styles.statLabel}>Comentarios</Text>
+                      </View>
+                      <View style={styles.statItem}>
+                        <Text style={styles.statNumber}>{post.likesCount || 0}</Text>
+                        <Text style={styles.statLabel}>Curtidas</Text>
+                      </View>
+                      <View style={styles.statItem}>
+                        <Text style={styles.statNumber}>{post.saves || 0}</Text>
+                        <Text style={styles.statLabel}>Itens Salvos</Text>
+                      </View>
+                    </View>
+
+                    <Divider style={{ marginVertical: 10, backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
+                  </View>
+                </Card.Content>
+                
+                <PostActions
+                  commentsCount={post.comments.length}
+                  initialReposts={0} 
+                  initialLikes={post.likes.length}
+                  onBookmarkPress={onBookmarkPress}
+                  isBookmarked={isBookmarked}
+                />
+                
+                <Divider style={{ marginVertical: 10, backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
+                
+                <View style={styles.commentsContainer}>
+                  {post.comments?.map((comment: any, index: number) => (
+                    <React.Fragment key={index}>
+                      <View style={styles.commentItem}>
+                        <Avatar.Image 
+                          source={comment.icon} 
+                          size={40} 
+                          style={styles.commentAvatar}
+                        />
+                        
+                        <View style={styles.commentContent}>
+                          <View style={styles.commentHeader}>
+                            <Text style={styles.commentAuthor}>{comment.nickname}</Text>
+                            <Text style={styles.commentUsername}>@{comment.username}</Text>
+                            <Text style={styles.commentTime}>• {comment.time}</Text>
+                          </View>
+                          
+                          {comment.replyTo && (
+                            <Text style={styles.replyText}>
+                              Em resposta a <Text style={styles.replyUsername}>@{comment.replyTo}</Text>
+                            </Text>
+                          )}
+                          
+                          <Text style={styles.commentText}>{comment.comment}</Text>
+                          
+                          <TouchableOpacity style={styles.commentLike}>
+                            <Icon 
+                              name="heart-outline" 
+                              type="material-community" 
+                              size={14} 
+                              color="gray" 
+                            />
+                            <Text style={styles.commentLikeCount}>{comment.likes}</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                      
+                      {index < post.comments.length - 1 && (
+                        <Divider style={{marginBottom: 10, backgroundColor: 'rgba(255, 255, 255, 0.2)'}} />
+                      )}
+                    </React.Fragment>
+                  ))}    
+                </View>
+              </Card>
+            </ScrollView>
+          </View>
         </View>
-        </View>
-        <CreateCommentModal
-            visible={isCommentModalVisible}
-            onClose={() => setIsCommentModalVisible(false)}
-            onSubmit={(commentText) => {
-                console.log('Novo comentário:', commentText);
-                setIsCommentModalVisible(false);
-            }}
-            currentUser={{
-                id: "user123", 
-                name: "Seu Nome",
-                avatar: require('../../assets/images/abihobbs.jpeg') 
-            }}
-            post={post}
+
+        {/* Modal da imagem em tela cheia */}
+        <Modal
+          visible={isImageModalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setIsImageModalVisible(false)}
+        >
+          <TouchableOpacity
+            style={styles.fullImageContainer}
+            onPress={() => setIsImageModalVisible(false)}
+            activeOpacity={1}
+          >
+            <Image
+              source={{ uri: selectedImage! }}
+              style={styles.fullImage}
+              resizeMode="contain"
             />
+          </TouchableOpacity>
+        </Modal>
+
+        <CreateCommentModal
+          visible={isCommentModalVisible}
+          onClose={() => setIsCommentModalVisible(false)}
+          onSubmit={(commentText) => {
+              console.log('Novo comentário:', commentText);
+              setIsCommentModalVisible(false);
+          }}
+          currentUser={{
+              id: "user123", 
+              name: "Seu Nome",
+              avatar: require('../../assets/images/abihobbs.jpeg') 
+          }}
+          post={post}
+        />
       </Modal>
     </Portal>
   );
@@ -361,5 +392,16 @@ const styles = StyleSheet.create({
   replyUsername: {
     color: '#4B7CCC',
     fontSize: 12,
-  }
+  },
+  fullImageContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.95)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  } as ViewStyle,
+  fullImage: {
+    width: '100%',
+    height: '100%',
+  } as ImageStyle,
 });
