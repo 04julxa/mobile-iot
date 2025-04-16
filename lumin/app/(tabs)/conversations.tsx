@@ -7,7 +7,7 @@ import * as SecureStore from 'expo-secure-store';
 interface User {
   id: string;
   username: string;
-  avatar?: string;
+  avatar?: string | null;
 }
 
 const Conversations = () => {
@@ -15,6 +15,13 @@ const Conversations = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const API_URLS = [
+    'http://10.5.4.33:3001/api/user/',
+    'http://26.165.8.133:3001/api/user/',
+    'http://localhost:3001/api/user/',
+  ];
+  let selectedApiUrl = API_URLS[0]; 
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -27,7 +34,48 @@ const Conversations = () => {
         return;
       }
 
-      const response = await fetch('http://10.5.4.33:3001/api/user/', {
+      const testConnectivity = async () => {
+        const endpoints = ['', '/api']; 
+        for (const url of API_URLS) {
+          const baseUrl = url.replace('/api/user/', '');
+          for (const endpoint of endpoints) {
+            const testUrl = `${baseUrl}${endpoint}`;
+            console.log('[Conversations] Testing connectivity to:', testUrl);
+            try {
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 5000); 
+              const response = await fetch(testUrl, {
+                method: 'GET',
+                signal: controller.signal,
+              });
+              clearTimeout(timeoutId);
+              console.log('[Conversations] Connectivity test response for', testUrl, ':', response.status, 'ok:', response.ok);
+              if (response.ok || response.status === 404) {
+                selectedApiUrl = url;
+                console.log('[Conversations] Selected API URL:', selectedApiUrl);
+                return true;
+              }
+            } catch (err: any) {
+              console.error('[Conversations] Connectivity test failed for', testUrl, ':', {
+                message: err.message,
+                name: err.name,
+                code: err.code,
+              });
+            }
+          }
+        }
+        console.error('[Conversations] All connectivity tests failed');
+        return false;
+      };
+
+      const isServerReachable = await testConnectivity();
+      if (!isServerReachable) {
+        setError('Servidor não está acessível. Verifique a conexão ou o endereço do servidor.');
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(selectedApiUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -48,6 +96,7 @@ const Conversations = () => {
       }
 
       const data = await response.json();
+      console.log('[Conversations] API response data:', data); 
       if (!data.success || !Array.isArray(data.data)) {
         setError('Formato de dados inválido. Esperava-se uma lista de usuários.');
         setLoading(false);
@@ -57,11 +106,13 @@ const Conversations = () => {
       const mappedUsers = data.data.map((user: any) => ({
         id: user._id,
         username: user.username,
-        avatar: user.avatar,
+        avatar: user.avatar ? (typeof user.avatar === 'string' ? user.avatar : user.avatar.uri || null) : null, 
       }));
+      console.log('[Conversations] Mapped users:', mappedUsers); 
       setUsers(mappedUsers);
       setLoading(false);
     } catch (err: any) {
+      console.error('[Conversations] Error fetching users:', err);
       setError(err.message || 'Falha na conexão com o servidor.');
       setLoading(false);
     }
@@ -84,11 +135,12 @@ const Conversations = () => {
       onPress={() => startChat(item.id)}
       activeOpacity={0.7}
     >
-      {item.avatar ? (
+      {item.avatar && typeof item.avatar === 'string' ? (
         <Image
           source={{ uri: item.avatar }}
           style={styles.avatar}
           resizeMode="cover"
+          onError={(e) => console.log('[Image] Error loading avatar:', e.nativeEvent.error)}
         />
       ) : (
         <MaterialCommunityIcons name="account-circle" size={40} color="#4B7CCC" />
@@ -183,7 +235,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#4B7CCC', // Fallback caso a imagem falhe
+    backgroundColor: '#4B7CCC',
   },
   userInfo: {
     marginLeft: 10,
