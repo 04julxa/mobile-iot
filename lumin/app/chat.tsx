@@ -42,7 +42,6 @@ const Chat = () => {
   const [chat, setChat] = useState<{ messages: Message[] }>({ messages: [] });
   const [message, setMessage] = useState('');
 
-  // Cache local de mensagens
   const cacheMessages = async (messages: Message[]) => {
     await AsyncStorage.setItem(`chat_${receiverId}`, JSON.stringify(messages));
   };
@@ -54,7 +53,6 @@ const Chat = () => {
     }
   };
 
-  // Verificação de autenticação e parâmetros
   useEffect(() => {
     const checkAuth = async () => {
       const userToken = await SecureStore.getItemAsync('userToken');
@@ -80,16 +78,13 @@ const Chat = () => {
     checkAuth();
   }, [params]);
 
-  // Buscar nome do destinatário
   useEffect(() => {
     if (!userLogged || !receiverId || !token) return;
 
     const fetchReceiver = async () => {
       try {
-        // Carregar mensagens do cache
         await loadCachedMessages();
 
-        // Buscar nome do destinatário
         const userResponse = await fetch(`http://10.5.4.33:3001/api/user/${receiverId}`, {
           method: 'GET',
           headers: {
@@ -115,7 +110,6 @@ const Chat = () => {
     fetchReceiver();
   }, [userLogged, receiverId, token]);
 
-  // Configuração do Socket.IO com reconexão
   useEffect(() => {
     if (!token || !userLogged) return;
 
@@ -125,24 +119,23 @@ const Chat = () => {
     });
 
     socket.on('connect', () => {
-      socket.emit('add_user', userLogged); // Adicionar usuário ao conectar
+      socket.emit('add_user', userLogged); 
     });
 
     socket.on('receive_message', (data: Message) => {
       setChat((prev) => {
-        // Verificar duplicatas
         if (prev.messages.some((msg) => msg.id === data.id)) {
           return prev;
         }
         const newMessages = [...prev.messages, data];
-        cacheMessages(newMessages); // Salvar no cache
+        cacheMessages(newMessages);
         return { messages: newMessages };
       });
     });
 
     socket.on('connect_error', () => {
       console.warn('Erro de conexão com o servidor. Tentando reconectar...');
-      setTimeout(() => socket.connect(), 5000); // Reconectar após 5 segundos
+      setTimeout(() => socket.connect(), 5000); 
     });
 
     return () => {
@@ -150,7 +143,6 @@ const Chat = () => {
     };
   }, [token, userLogged]);
 
-  // Rolar para a última mensagem
   useEffect(() => {
     if (chat.messages.length > 0) {
       scrollRef.current?.scrollToEnd({ animated: true });
@@ -173,7 +165,7 @@ const Chat = () => {
 
     setChat((prev) => {
       const newMessages = [...prev.messages, messageObject];
-      cacheMessages(newMessages); // Salvar no cache
+      cacheMessages(newMessages); 
       return { messages: newMessages };
     });
     setMessage('');
